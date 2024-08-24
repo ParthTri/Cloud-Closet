@@ -1,6 +1,6 @@
-import { User } from './api/user/user.interface';
+import { UserDTO } from './api/user/interfaces/user.dto';
 
-export const users: User[] = [
+export const users: UserDTO[] = [
   {
     ID: 1,
     Name: 'John',
