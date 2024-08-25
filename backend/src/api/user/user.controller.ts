@@ -6,12 +6,6 @@ import { CreateUserDTO } from './interfaces/create-user.dto';
 @Controller('api/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Get()
-  getHello(): string {
-    return this.userService.getHello();
-  }
-
   // Create a new user
   @Post()
   create(@Body() body: CreateUserDTO): number {
