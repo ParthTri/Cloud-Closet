@@ -4,8 +4,32 @@ import { Link } from "expo-router";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { useState } from "react";
 
+// TODO: Need to add validation that the checkbox has been ticked
+
 export default function Signup() {
 	const [pressed, setPressed] = useState(false);
+
+	// User data states for pushing to API later
+	const [name, setName] = useState("");
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+
+	const submit = () => {
+		console.log(
+			JSON.stringify({ Name: name, Email: email, Password: password })
+		);
+		fetch("http://cloudcloset.kolide.co.nz/api/user", {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ Name: name, Email: email, Password: password }),
+		})
+			.then((x) => x.json())
+			.then((x) => console.log(x))
+			.catch((err) => console.log(err));
+	};
 
 	return (
 		<View style={{ flex: 1, padding: 10 }}>
@@ -22,15 +46,27 @@ export default function Signup() {
 			>
 				<View>
 					<Text style={styles.label}>Full name</Text>
-					<TextInput style={styles.input} placeholder="Maggie"></TextInput>
+					<TextInput
+						style={styles.input}
+						placeholder="Maggie"
+						onChangeText={(text) => setName(text)}
+					></TextInput>
 				</View>
 				<View>
 					<Text style={styles.label}>Email</Text>
-					<TextInput style={styles.input} inputMode="email"></TextInput>
+					<TextInput
+						style={styles.input}
+						inputMode="email"
+						onChangeText={(text) => setEmail(text)}
+					></TextInput>
 				</View>
 				<View>
 					<Text style={styles.label}>Password</Text>
-					<TextInput style={styles.input} secureTextEntry={true}></TextInput>
+					<TextInput
+						style={styles.input}
+						secureTextEntry={true}
+						onChangeText={(text) => setPassword(text)}
+					></TextInput>
 				</View>
 				<View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
 					<BouncyCheckbox
@@ -45,6 +81,7 @@ export default function Signup() {
 			<Pressable
 				onPressIn={(e) => setPressed(true)}
 				onPressOut={(e) => setPressed(false)}
+				onPress={() => submit()}
 				style={({ pressed }) => [
 					styles.button,
 					{
