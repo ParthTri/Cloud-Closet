@@ -43,7 +43,7 @@ export class DatabaseHelper {
             const resultSet = await pool.request().query(query);
 
             // Return the result set
-            return resultSet?.recordsets[0];
+            return resultSet?.recordsets[0] ?? resultSet;
         } catch (err) {
             console.error("Query failed: ", err.message);
             throw err;
@@ -54,4 +54,6 @@ export class DatabaseHelper {
             }
         }
     }
+
+    
 }
