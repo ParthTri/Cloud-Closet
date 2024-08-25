@@ -9,6 +9,10 @@ export class UserService {
     return { msg: 'Hi Everyone!!!' };
   }
 
+  getAll(): UserDTO[] {
+    return users;
+  }
+
   getUser(id: number): UserDTO[] {
     const found: UserDTO[] = users.map((user: UserDTO) => {
       if (user.ID == id) {
