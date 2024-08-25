@@ -6,14 +6,14 @@ export class CategoryService {
     constructor(private readonly databaseHelper: DatabaseHelper) {}
 
     async getAllCategories(): Promise<string> {
-        const query = "select * from tags;";
+        const query = "select * from category;";
         const result = this.databaseHelper.queryDatabase(query);
 
         return result;
     }
 
     async getCategoryById(id: bigint): Promise<string> {
-        const query = `select * from tags where id = ${id};`;
+        const query = `select * from category where id = ${id};`;
         const result = this.databaseHelper.queryDatabase(query);
 
         return result;
