@@ -1,22 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { UserDTO } from './interfaces/user.dto';
-import { users } from 'src/dummydata';
 import { CreateUserDTO } from './interfaces/create-user.dto';
 import { DatabaseHelper } from 'src/database.helper';
 import * as bcrypt from 'bcrypt';
+import { Users } from './user.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 const SALT_ROUNDS: number = 4;
 
 @Injectable()
 export class UserService {
-  constructor(private readonly databaseHelper: DatabaseHelper) {}
+  constructor(
+    private readonly databaseHelper: DatabaseHelper,
+
+    @InjectRepository(Users)
+    private userRepository: Repository<Users>,
+  ) {}
 
   getHello(): any {
     return { msg: 'Hi Everyone!!!' };
   }
 
-  getAll(): UserDTO[] {
-    return users;
+  getAll(): Promise<Users[]> {
+    return this.userRepository.find();
   }
 
   async getUser(id: number): Promise<UserDTO> {
