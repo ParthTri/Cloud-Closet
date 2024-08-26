@@ -8,12 +8,12 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
   // Create a new user
   @Post()
-  create(@Body() body: CreateUserDTO): number {
+  create(@Body() body: CreateUserDTO): Promise<number> {
     return this.userService.createUser(body);
   }
 
   @Get(':id')
-  getUserID(@Param() params: any): UserDTO[] {
+  getUserID(@Param() params: any): Promise<UserDTO> {
     return this.userService.getUser(params.id);
   }
 }
