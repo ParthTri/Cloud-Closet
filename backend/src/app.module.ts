@@ -19,14 +19,8 @@ import { DataSource } from 'typeorm';
     }),
     ApiModule,
   ],
-  controllers: [AppController, ClosetController],
-  providers: [
-    AppService,
-    DatabaseHelper,
-    CategoryService,
-    StorageHelper,
-    ImageService,
-  ],
+  controllers: [AppController],
+  providers: [],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
