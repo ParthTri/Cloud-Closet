@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 const { BlobServiceClient } = require("@azure/storage-blob");
 require("dotenv").config();
 
-const AZURE_STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=cloudcloset;AccountKey=sCJNHf+hrmmXgFKZaFZoON0kXCC7K954FxAVwiaUtDp2VbsfRMg19G2m4YbdmWsFXR69JBMFhsgF+AStnnmkrQ==;EndpointSuffix=core.windows.net";
+const AZURE_STORAGE_CONNECTION_STRING = process.env["storage_connection_string"];
 
 // Create the BlobServiceClient object with connection string
 const blobServiceClient = BlobServiceClient.fromConnectionString(

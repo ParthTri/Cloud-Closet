@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { StorageHelper } from "./storage.helper";
-import { DatabaseHelper } from './database.helper';
+import { StorageHelper } from "../../storage.helper";
+import { DatabaseHelper } from '../../database.helper';
 import {removeBackground} from "@imgly/background-removal-node";
 import { UserImage, UserImageCategory } from './userimage';
 
@@ -63,7 +63,7 @@ export class ImageService {
     async getImagesByUserId(userId) : Promise<Array<UserImage>> {
         const query =`SELECT *
         FROM [dbo].[Image]
-        WHERE UserId = '${userId}'`;
+        WHERE user_id = '${userId}'`;
         const result = await this.databaseHelper.queryDatabase(query);
         let images = new Array<UserImage>();
 
