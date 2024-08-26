@@ -3,6 +3,9 @@ import { UserDTO } from './interfaces/user.dto';
 import { users } from 'src/dummydata';
 import { CreateUserDTO } from './interfaces/create-user.dto';
 import { DatabaseHelper } from 'src/database.helper';
+import * as bcrypt from 'bcrypt';
+
+const SALT_ROUNDS: number = 4;
 
 @Injectable()
 export class UserService {
@@ -36,14 +39,31 @@ export class UserService {
     return foundUser;
   }
 
-  createUser(user: CreateUserDTO): number {
-    const newUser: UserDTO = {
-      ID: users.length + 1,
-      Name: user.Name,
-      Email: user.Email,
-      Password: user.Password,
-    };
-    users.push(newUser);
-    return newUser.ID;
+  async createUser(user: CreateUserDTO): Promise<number> {
+    try {
+      const newUser: UserDTO = {
+        Name: user.Name,
+        Email: user.Email,
+        Password: user.Password,
+      };
+
+      newUser.Password = await bcrypt.hashSync(newUser.Password, SALT_ROUNDS);
+
+      const query: string = `INSERT INTO Users (userName, email, userPassword) VALUES (
+        '${newUser.Name}', 
+        '${newUser.Email}', 
+        '${newUser.Password}'
+      )`;
+
+      const res = await this.databaseHelper.queryDatabase(query);
+      if (res['rowsAffected'] != null) {
+        const rowsAffected: number = res['rowsAffected'].length;
+        return rowsAffected;
+      }
+    } catch (e) {
+      console.log(e.message);
+      throw e;
+    }
+    return 0;
   }
 }
