@@ -4,20 +4,31 @@ require("dotenv").config();
 export class DatabaseHelper {
   private config: sql.config;
 
-    constructor() {
-        this.config = {
-            user: process.env["db_user"], 
-            password: process.env["db_password"],
-            server: process.env["db_server"],
-            port: parseInt(process.env["db_port"]),
-            database: process.env["db_database"],
-            authentication: {
-                type: 'default'
-            },
-            options: {
-                encrypt: true 
-            }
-        };
+  constructor() {
+    this.config = {
+        user: process.env["db_user"], 
+        password: process.env["db_password"],
+        server: process.env["db_server"],
+        port: parseInt(process.env["db_port"]),
+        database: process.env["db_database"],
+        authentication: {
+            type: 'default'
+        },
+        options: {
+            encrypt: true 
+        }
+    };
+  }
+
+  // Function to connect to the database
+  private async connectToDatabase(): Promise<sql.ConnectionPool> {
+    try {
+      const pool = await sql.connect(this.config);
+      console.log('Connected to the database.');
+      return pool;
+    } catch (err) {
+      console.error('Database connection failed: ', err.message);
+      throw err;
     }
   }
 
