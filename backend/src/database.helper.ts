@@ -6,17 +6,17 @@ export class DatabaseHelper {
 
   constructor() {
     this.config = {
-      user: process.env["db_user"], 
-      password: process.env["db_password"],
-      server: process.env["db_server"],
-      port: parseInt(process.env["db_port"]),
-      database: process.env["db_database"],
-      authentication: {
-        type: 'default',
-      },
-      options: {
-        encrypt: true,
-      },
+        user: process.env["db_user"], 
+        password: process.env["db_password"],
+        server: process.env["db_server"],
+        port: parseInt(process.env["db_port"]),
+        database: process.env["db_database"],
+        authentication: {
+            type: 'default'
+        },
+        options: {
+            encrypt: true 
+        }
     };
   }
 
