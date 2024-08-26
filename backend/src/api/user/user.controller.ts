@@ -13,7 +13,7 @@ export class UserController {
   }
 
   @Get(':id')
-  getUserID(@Param() params: any): UserDTO[] {
+  getUserID(@Param() params: any): Promise<UserDTO> {
     return this.userService.getUser(params.id);
   }
 }
