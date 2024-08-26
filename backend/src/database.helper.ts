@@ -1,15 +1,16 @@
 import * as sql from 'mssql';
+require("dotenv").config();
 
 export class DatabaseHelper {
     private config: sql.config;
 
     constructor() {
         this.config = {
-            user: 'dbadmin', 
-            password: 'Cloudcloset2024@',
-            server: 'cloudcloset.database.windows.net',
-            port: 1433,
-            database: 'CloudClosetDB',
+            user: process.env["db_user"], 
+            password: process.env["db_password"],
+            server: process.env["db_server"],
+            port: parseInt(process.env["db_port"]),
+            database: process.env["db_database"],
             authentication: {
                 type: 'default'
             },

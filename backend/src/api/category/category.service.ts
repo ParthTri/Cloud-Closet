@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseHelper } from "./database.helper";
+import { DatabaseHelper } from "../../database.helper";
 
 @Injectable()
 export class CategoryService {
