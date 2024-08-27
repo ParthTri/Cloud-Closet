@@ -4,9 +4,10 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
 } from 'typeorm';
 import { User } from '../user/user.entity';
-
+import { Image } from '../image/image.entity';
 @Entity()
 export class Category {
   @PrimaryGeneratedColumn()
@@ -18,4 +19,7 @@ export class Category {
   @ManyToOne(() => User, (user) => user.categories)
   @JoinColumn({ name: 'userID' })
   user: User;
+
+  @ManyToMany(() => Image, (image) => image.categories)
+  images: Image[];
 }
