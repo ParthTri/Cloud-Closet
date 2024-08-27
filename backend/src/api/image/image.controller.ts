@@ -9,9 +9,9 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { ImageService } from './image.service';
-import { UserImage } from './userimage';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 import { UploadImage } from './interface/uploadImage.dto';
+import { Image } from './image.entity';
 
 @Controller('api/image')
 export class ImageController {
@@ -39,7 +39,7 @@ export class ImageController {
   }
 
   @Get(':userId')
-  async getImagesByUserId(@Param('userId') userId): Promise<Array<UserImage>> {
+  async getImagesByUserId(@Param('userId') userId: string): Promise<Image[]> {
     return await this.imageService.getImagesByUserId(userId);
   }
 }
