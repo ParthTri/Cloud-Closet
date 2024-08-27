@@ -38,7 +38,7 @@ export class ImageController {
     return 'Deleted';
   }
 
-  @Get('api/images/:userId')
+  @Get(':userId')
   async getImagesByUserId(@Param('userId') userId): Promise<Array<UserImage>> {
     return await this.imageService.getImagesByUserId(userId);
   }
