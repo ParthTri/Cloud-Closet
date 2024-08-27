@@ -12,7 +12,7 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(
 @Injectable()
 export class StorageHelper {
   async uploadImage(
-    image: string | Blob,
+    image: string | Blob | Buffer,
     containerName: string,
     blobName: string,
   ): Promise<string> {
@@ -35,9 +35,7 @@ export class StorageHelper {
       const buffer = Buffer.from(arrayBuffer);
       await blockBlobClient.uploadData(buffer, blobOptions);
     } else {
-      let matchesBlobImg = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-      let imgBuffer = Buffer.from(matchesBlobImg[2], 'base64');
-      await blockBlobClient.uploadData(imgBuffer, blobOptions);
+      await blockBlobClient.upload(image, image.length);
     }
 
     return blockBlobClient.url;
