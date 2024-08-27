@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Image } from '../image/image.entity';
+import { Category } from '../category/category.entity';
 
 @Entity()
 export class User {
@@ -17,4 +18,7 @@ export class User {
 
   @OneToMany(() => Image, (image) => image.user)
   images: Image[];
+
+  @OneToMany(() => Category, (category) => category.user)
+  categories: Category[];
 }
