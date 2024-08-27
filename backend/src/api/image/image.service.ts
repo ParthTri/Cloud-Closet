@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { StorageHelper } from '../../storage.helper';
 import { DatabaseHelper } from '../../database.helper';
 import { removeBackground } from '@imgly/background-removal-node';
-import { UserImage, UserImageCategory } from './userimage';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Image } from './image.entity';
@@ -99,39 +98,15 @@ export class ImageService {
     }
   }
 
-  async getImagesByUserId(userId): Promise<Array<UserImage>> {
-    const query = `SELECT *
-        FROM [dbo].[Image]
-        WHERE userID = '${userId}'`;
-    const result = await this.databaseHelper.queryDatabase(query);
-    let images = new Array<UserImage>();
+  async getImagesByUserId(userId): Promise<Image[]> {
+    const foundUser: User = await this.userRepository.findOneBy({
+      userID: userId,
+    });
+    const foundImages: Image[] = await this.imageRepository.find({
+      where: { user: foundUser },
+      relations: ['categories'],
+    });
 
-    await result.forEach(async (element) => {});
-
-    for (const element of result) {
-      var image = new UserImage();
-      image.Id = element.Id;
-      image.ProcessedUrl = element.ProcessedUrl;
-      images.push(image);
-
-      const queryCategory = `select pc.ImageId, pc.CategoryId, c.Name
-                                   from ImageCategory pc join Category c on pc.CategoryId = c.Id
-                                   where pc.ImageId = ${image.Id}`;
-      const categoryResult =
-        await this.databaseHelper.queryDatabase(queryCategory);
-
-      var categories = new Array<UserImageCategory>();
-      for (const el of categoryResult) {
-        var category = new UserImageCategory();
-        category.Id = el.CategoryId;
-        category.Name = el.Name;
-
-        categories.push(category);
-      }
-
-      image.Categories = categories;
-    }
-
-    return images;
+    return foundImages;
   }
 }
