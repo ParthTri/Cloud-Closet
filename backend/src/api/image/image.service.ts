@@ -72,8 +72,31 @@ export class ImageService {
     return out.imageID;
   }
 
-  async deleteUserImage(image) {
-    this.storageHelper.deleteImage(image, USER_UPLOAD_CONTAINER);
+  async deleteUserImage(image: number) {
+    const targetImage = await this.imageRepository.findOneBy({
+      imageID: image,
+    });
+
+    // Get the image names from the ID
+    let rawImage = targetImage.rawUrl;
+    const rawImageData = rawImage.split('/');
+
+    let processedImage = targetImage.processedUrl;
+    const processedImageData = processedImage.split('/');
+
+    processedImage = processedImageData.pop();
+    rawImage = rawImageData.pop();
+
+    try {
+      await this.storageHelper.deleteImage(
+        processedImage,
+        USER_UPLOAD_CONTAINER,
+      );
+      await this.storageHelper.deleteImage(rawImage, USER_UPLOAD_CONTAINER);
+      await this.imageRepository.delete({ imageID: image });
+    } catch (e) {
+      throw e;
+    }
   }
 
   async getImagesByUserId(userId): Promise<Array<UserImage>> {
