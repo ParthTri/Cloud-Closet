@@ -1,9 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Image } from '../image/image.entity';
 
 @Entity()
-export class Users {
-  @PrimaryGeneratedColumn()
-  userID: number;
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  userID: string;
 
   @Column()
   userName: string;
@@ -13,4 +14,7 @@ export class Users {
 
   @Column()
   userPassword: string;
+
+  @OneToMany(() => Image, (image) => image.user)
+  images: Image[];
 }
