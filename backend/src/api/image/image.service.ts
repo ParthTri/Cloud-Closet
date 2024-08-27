@@ -3,6 +3,10 @@ import { StorageHelper } from '../../storage.helper';
 import { DatabaseHelper } from '../../database.helper';
 import { removeBackground } from '@imgly/background-removal-node';
 import { UserImage, UserImageCategory } from './userimage';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Image } from './image.entity';
+import { User } from '../user/user.entity';
 
 const USER_UPLOAD_CONTAINER = 'upload';
 const { v1: uuidv1 } = require('uuid');
@@ -12,11 +16,22 @@ export class ImageService {
   constructor(
     private readonly storageHelper: StorageHelper,
     private readonly databaseHelper: DatabaseHelper,
+
+    @InjectRepository(Image)
+    private imageRepository: Repository<Image>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
-  async uploadUserImage(image, fileName, categories: Array<bigint>) {
+  async uploadUserImage(
+    image: Buffer,
+    fileName: string,
+    categories: Array<bigint>,
+    userID: string,
+  ): Promise<number> {
     // Upload user image
-    const blobName = `raw-${uuidv1()}.${fileName.split('.')[1]}`;
+    let blobName = `raw-${uuidv1()}.${fileName.split('.')[1]}`;
     const imageUrl = await this.storageHelper.uploadImage(
       image,
       USER_UPLOAD_CONTAINER,
@@ -25,44 +40,36 @@ export class ImageService {
     console.log(`Raw image url: ${imageUrl}`);
 
     // Remove background and upload
-    removeBackground(imageUrl).then(async (processedImage: Blob) => {
-      const blobName = `processed-${uuidv1()}.png`;
-      const processedUrl = await this.storageHelper.uploadImage(
-        processedImage,
-        USER_UPLOAD_CONTAINER,
-        blobName,
-      );
+    const blob = await removeBackground(imageUrl);
+    blobName = `processed-${uuidv1()}.png`;
+    const processedUrl = await this.storageHelper.uploadImage(
+      blob,
+      USER_UPLOAD_CONTAINER,
+      blobName,
+    );
 
-      console.log(`Processed image url: ${processedUrl}`);
+    // Insert to Photo database
+    const newImage: Image = new Image();
+    newImage.processedUrl = processedUrl;
+    newImage.rawUrl = imageUrl;
 
-      // Insert to Photo database
-      const insertImageCommand = `INSERT INTO [dbo].[Image]
-                                ([UserId]
-                                ,[RawUrl]
-                                ,[ProcessedUrl]
-                                ,[CreatedDate])
-                                VALUES
-                                ('A123'
-                                ,'${imageUrl}'
-                                ,'${processedUrl}'
-                                , GETDATE());
-                                SELECT SCOPE_IDENTITY() AS Id;`;
-      const newImage =
-        await this.databaseHelper.queryDatabase(insertImageCommand);
+    const user = await this.userRepository.findOneBy({ userID: userID });
+    newImage.user = user;
+    const out = await this.imageRepository.save(newImage);
 
-      console.log(`New image id: ${newImage[0].Id}`);
-      // Insert to ImageCategory database
-      categories.forEach((element) => {
-        const insertImageCategoryCommand = `INSERT INTO [dbo].[ImageCategory]
-                ([ImageId]
-                ,[CategoryId])
-          VALUES
-                (${newImage[0].Id}
-                ,${element})`;
+    // TODO: Insert to ImageCategory database
+    // categories.forEach((element) => {
+    //   const insertImageCategoryCommand = `INSERT INTO [dbo].[ImageCategory]
+    //           ([ImageId]
+    //           ,[CategoryId])
+    //     VALUES
+    //           (${newImage[0].Id}
+    //           ,${element})`;
 
-        this.databaseHelper.queryDatabase(insertImageCategoryCommand);
-      });
-    });
+    //   this.databaseHelper.queryDatabase(insertImageCategoryCommand);
+    // });
+
+    return out.imageID;
   }
 
   async deleteUserImage(image) {
