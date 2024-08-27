@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserSignIn } from './interfaces/userSigin.dto';
 
 const SALT_ROUNDS: number = 4;
 
@@ -28,6 +29,7 @@ export class UserService {
     return this.userRepository.findOneBy({ userID: id });
   }
 
+  // TODO: Add input checking if email is already in use
   async createUser(user: CreateUserDTO): Promise<string> {
     try {
       const newUser: User = new User();
@@ -40,6 +42,23 @@ export class UserService {
     } catch (e) {
       console.log(e.message);
       throw e;
+    }
+  }
+
+  async authenticateUser(user: UserSignIn): Promise<boolean> {
+    try {
+      const foundUser = await this.userRepository.findOneByOrFail({
+        email: user.email,
+      });
+
+      const result: boolean = bcrypt.compareSync(
+        user.password,
+        foundUser.userPassword,
+      );
+
+      return result;
+    } catch (e) {
+      return false;
     }
   }
 }

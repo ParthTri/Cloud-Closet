@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
-// import { UserDTO } from './interfaces/user.dto';
 import { CreateUserDTO } from './interfaces/create-user.dto';
 import { User } from './user.entity';
+import { UserSignIn } from './interfaces/userSigin.dto';
 
 @Controller('api/user')
 export class UserController {
@@ -21,5 +21,10 @@ export class UserController {
   @Get()
   getUser(): Promise<User[]> {
     return this.userService.getAll();
+  }
+
+  @Post('/signin')
+  async signIn(@Body() userData: UserSignIn): Promise<boolean> {
+    return this.userService.authenticateUser(userData);
   }
 }
