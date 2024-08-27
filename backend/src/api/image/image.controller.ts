@@ -1,20 +1,35 @@
-import { Controller, Get, Param, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { ImageService } from './image.service';
 import { UserImage } from './userimage';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
+import { UploadImage } from './interface/uploadImage.dto';
 
-@Controller()
+@Controller('api/image')
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 
-  @Post('api/upload')
-  async uploadImage(@Body() req: any): Promise<string> {
-    await this.imageService.uploadUserImage(
-      req.image,
-      req.fileName,
-      req.categories,
+  @Post()
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: UploadImage,
+  ): Promise<any> {
+    const imageID = await this.imageService.uploadUserImage(
+      file.buffer,
+      body.fileName,
+      body.categories,
+      body.userID,
     );
-
-    return 'Uploaded';
+    return { imageID: imageID };
   }
 
   @Post('api/delete')
