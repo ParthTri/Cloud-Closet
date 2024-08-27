@@ -8,7 +8,7 @@ import { Image } from './image.entity';
 import { User } from '../user/user.entity';
 
 const USER_UPLOAD_CONTAINER = 'upload';
-const { v1: uuidv1 } = require('uuid');
+import { v1 as uuidv1 } from 'uuid';
 
 @Injectable()
 export class ImageService {
