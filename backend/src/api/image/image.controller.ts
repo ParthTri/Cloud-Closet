@@ -32,9 +32,9 @@ export class ImageController {
     return { imageID: imageID };
   }
 
-  @Post('api/delete')
-  async deleteImage(@Body() req: any): Promise<string> {
-    await this.imageService.deleteUserImage(req.imageName);
+  @Delete(':id')
+  async deleteImage(@Param('id') imageID: number): Promise<string> {
+    await this.imageService.deleteUserImage(imageID);
     return 'Deleted';
   }
 
