@@ -1,21 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseHelper } from "../../database.helper";
+import { DatabaseHelper } from '../../database.helper';
+import { Category } from './category.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CategoryService {
-    constructor(private readonly databaseHelper: DatabaseHelper) {}
+  constructor(
+    private readonly databaseHelper: DatabaseHelper,
 
-    async getAllCategories(): Promise<string> {
-        const query = "select * from category;";
-        const result = this.databaseHelper.queryDatabase(query);
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
+  ) {}
 
-        return result;
-    }
+  async getAllCategories(): Promise<Category[]> {
+    const x = await this.categoryRepository.find();
+    return x;
+  }
 
-    async getCategoryById(id: bigint): Promise<string> {
-        const query = `select * from category where id = ${id};`;
-        const result = this.databaseHelper.queryDatabase(query);
+  async getCategoryById(id: bigint): Promise<Category> {
+    return await this.categoryRepository.findOneBy({ categoryID: id });
+  }
 
-        return result;
-    }
+  async getUserCategory(id: string): Promise<Category[]> {
+    return await this.categoryRepository
+      .createQueryBuilder()
+      .where('userID = :userId', { userId: id })
+      .execute();
+  }
 }
