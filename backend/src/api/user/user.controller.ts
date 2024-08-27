@@ -2,24 +2,24 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 // import { UserDTO } from './interfaces/user.dto';
 import { CreateUserDTO } from './interfaces/create-user.dto';
-import { Users } from './user.entity';
+import { User } from './user.entity';
 
 @Controller('api/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   // Create a new user
   @Post()
-  create(@Body() body: CreateUserDTO): Promise<number> {
+  create(@Body() body: CreateUserDTO): Promise<string> {
     return this.userService.createUser(body);
   }
 
   @Get(':id')
-  getUserID(@Param() params: any): Promise<Users> {
+  getUserID(@Param() params: any): Promise<User> {
     return this.userService.getUser(params.id);
   }
 
   @Get()
-  getUser(): Promise<Users[]> {
+  getUser(): Promise<User[]> {
     return this.userService.getAll();
   }
 }
