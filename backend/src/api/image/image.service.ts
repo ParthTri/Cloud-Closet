@@ -102,7 +102,7 @@ export class ImageService {
   async getImagesByUserId(userId): Promise<Array<UserImage>> {
     const query = `SELECT *
         FROM [dbo].[Image]
-        WHERE user_id = '${userId}'`;
+        WHERE userID = '${userId}'`;
     const result = await this.databaseHelper.queryDatabase(query);
     let images = new Array<UserImage>();
 
