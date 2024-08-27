@@ -1,32 +1,31 @@
 import * as sql from 'mssql';
-require("dotenv").config();
+require('dotenv').config();
 
 export class DatabaseHelper {
   private config: sql.config;
 
-    constructor() {
-        this.config = {
-            user: process.env["db_user"], 
-            password: process.env["db_password"],
-            server: process.env["db_server"],
-            port: parseInt(process.env["db_port"]),
-            database: process.env["db_database"],
-            authentication: {
-                type: 'default'
-            },
-            options: {
-                encrypt: true 
-            }
-        };
-    }
+  constructor() {
+    this.config = {
+      user: process.env['DB_USER'],
+      password: process.env['DB_PASS'],
+      server: process.env['db_server'],
+      port: parseInt(process.env['DB_PORT']),
+      database: 'CloudClosetDB',
+      authentication: {
+        type: 'default',
+      },
+      options: {
+        encrypt: true,
+      },
+    };
   }
 
   // Function to query the database
   // Function to query the database
-  public async queryDatabase(query: string): Promise<sql.IResult<any>> {
+  async queryDatabase(query: string): Promise<sql.IResult<any>> {
     let pool: sql.ConnectionPool | undefined;
     try {
-      pool = await this.connectToDatabase();
+      //   pool = await this.connectToDatabase();
       console.log('Reading rows from the Table...');
 
       // Perform the query and return the result set
