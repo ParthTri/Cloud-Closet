@@ -1,23 +1,22 @@
-import { Controller, Get, Param, Post, Body } from '@nestjs/common';
+import { Body, Controller, Get, Param } from '@nestjs/common';
 import { CategoryService } from './category.service';
+import { Category } from './category.entity';
+import { CategoryDTO } from './interfaces/category.dto';
 
-
-
-@Controller()
+@Controller('api/category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService
-  ) {}
+  constructor(private readonly categoryService: CategoryService) {}
 
-
-  @Get("api/categories")
-  async getAllCategories(): Promise<string> {
-    return this.categoryService.getAllCategories();
+  @Get()
+  async getAllCategories(@Body() req: CategoryDTO): Promise<Category[]> {
+    if (req.userID != null) {
+      return await this.categoryService.getUserCategory(req.userID);
+    }
+    return await this.categoryService.getAllCategories();
   }
 
-  @Get("api/category/:id")
-  async getCategoryById(@Param('id') id): Promise<string> {
+  @Get(':id')
+  async getCategoryById(@Param('id') id): Promise<Category> {
     return this.categoryService.getCategoryById(id);
   }
-
-
 }
