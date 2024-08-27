@@ -1,16 +1,14 @@
 import { Module } from '@nestjs/common';
-import { DatabaseHelper } from 'src/database.helper';
-import { StorageHelper } from 'src/storage.helper';
+import { DatabaseHelper } from '../../database.helper';
+import { StorageHelper } from '../../storage.helper';
 import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
-
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Image } from './image.entity';
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forFeature([Image])],
   controllers: [ImageController],
   providers: [DatabaseHelper, StorageHelper, ImageService],
-
 })
 export class ImageModule {}
-
-
