@@ -12,8 +12,8 @@ export class CategoryService {
         return result;
     }
 
-    async getCategoryById(id: bigint): Promise<string> {
-        const query = `select * from category where id = ${id};`;
+    async getCategoryById(id: number): Promise<string> {
+        const query = `select * from category where categoryId = ${id};`;
         const result = this.databaseHelper.queryDatabase(query);
 
         return result;

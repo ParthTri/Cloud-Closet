@@ -37,11 +37,32 @@ export class StorageHelper {
         return blockBlobClient.url;
     }
 
-    async deleteImage(imageName, containerName) {
-        // Get a block blob client
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-        const blockBlobClient = containerClient.getBlockBlobClient(imageName);
+    private extractBlobNameFromUrl(url: string): string {
+        // Create a URL object to parse the URL
+        const urlParts = new URL(url).pathname.split('/');
+        
+        // The last part of the path is the blob name
+        return urlParts[urlParts.length - 1];
+    }
 
+    async deleteImage(url, containerName) {
+        try{
+            // Get a reference to the container client
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+        
+        // Extract the blob name from the URL
+        const blobName = this.extractBlobNameFromUrl(url);
+        
+        // Get a reference to the blob client
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+        
+        // Delete the blob
         await blockBlobClient.delete();
+        console.log(`Blob ${blobName} deleted successfully.`);
+
+        } catch (error) {
+            console.error("Error deleting blob", error);
+            throw new Error("Error deleting blob from Azure Blob Storage");
+        }        
     }
 }

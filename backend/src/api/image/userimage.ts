@@ -1,10 +1,10 @@
 export class UserImage {
-    Id: bigint;
+    Id: number;
     ProcessedUrl: string;
-    Categories: Array<UserImageCategory>;
+    Categories: Array<UserImageCategory> = [];
 }
 
 export class UserImageCategory {
-    Id: bigint;
+    Id: number;
     Name: string;
 }

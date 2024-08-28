@@ -24,7 +24,7 @@ export class DatabaseHelper {
   private async connectToDatabase(): Promise<sql.ConnectionPool> {
     try {
       const pool = await sql.connect(this.config);
-      console.log('Connected to the database.');
+      //console.log('Connected to the database.');
       return pool;
     } catch (err) {
       console.error('Database connection failed: ', err.message);
@@ -38,7 +38,7 @@ export class DatabaseHelper {
     let pool: sql.ConnectionPool | undefined;
     try {
       pool = await this.connectToDatabase();
-      console.log('Reading rows from the Table...');
+      //console.log('Reading rows from the Table...');
 
       // Perform the query and return the result set
       const resultSet = await pool.request().query(query);
