@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Link } from "expo-router";
-import BouncyCheckbox from "react-native-bouncy-checkbox";
+
 import { useState } from "react";
 
 export default function SignIn() {
@@ -82,7 +82,6 @@ export default function SignIn() {
 					<Pressable
 						onPressIn={() => setSignUpPressed(true)}
 						onPressOut={() => setSignUpPressed(false)}
-						onPress={() => console.log("Navigate to sign up")} //change to move
 					>
 						<Text
 							style={[
@@ -92,7 +91,7 @@ export default function SignIn() {
 								},
 							]}
 						>
-							Don't have an account? Sign Up
+							<Link href="/auth/signup">Don't have an account? Sign Up</Link>
 						</Text>
 					</Pressable>
 				</View>
