@@ -66,7 +66,6 @@ export default function SignIn() {
 					<Pressable
 						onPressIn={() => setForgotPressed(true)}
 						onPressOut={() => setForgotPressed(false)}
-						onPress={() => console.log("Navigate to reset password")} //  change to move to next frame
 					>
 						<Text
 							style={[
@@ -103,14 +102,14 @@ export default function SignIn() {
 				style={({ pressed }) => [
 					styles.button,
 					{
-						backgroundColor: pressed ? "#8ABAE3" : "#fff",
+						backgroundColor: pressed ? "#fff" : "#8ABAE3",
 						color: "#fff",
 					},
 				]}
 			>
 				<Text
 					style={{
-						color: pressed ? "#fff" : "#8ABAE3",
+						color: pressed ? "#8ABAE3" : "#fff",
 					}}
 				>
 					Sign In
@@ -182,7 +181,4 @@ const styles = StyleSheet.create({
 		right: 0,
 		bottom: -30, 
 	},
-	signUpLink: {
-
-	}
 });
