@@ -9,11 +9,10 @@ COPY ./backend/package*.json ./
 
 # Install the Node.js dependencies
 RUN npm install -g @nestjs/cli
-RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which sh)" sh -
-RUN pnpm install
+RUN npm i
 
 # Expose the port the app runs on
-EXPOSE 8081
+EXPOSE 3000
 
 # Define the command to run the application
-CMD [ "node", "dist/main.js" ]
+CMD [ "node", "dist/main" ]
