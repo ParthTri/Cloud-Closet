@@ -1,6 +1,7 @@
 services:
   nginx:
     image: nginx:latest
+    container_name: nginx
     ports:
       - "80:80"
     volumes:
@@ -12,9 +13,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: api
     ports:
-      - "8081:8081"
+      - "3000:3000"
     volumes:
-      - ./backend/dist:/usr/src/app/dist
+      - ./backend/node_modules:/home/node/app/node_modules/
+      - ./backend/dist:/home/node/app/dist
     environment:
       - NODE_ENV=production
+      - DB_USER=
+      - DB_PASS=
+      - DB_HOST=
+      - DB_PORT=
+      - STORAGE_CONNECTION_STRING=
