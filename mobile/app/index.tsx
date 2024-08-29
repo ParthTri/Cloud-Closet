@@ -38,6 +38,7 @@ export default function HomeScreen() {
 						Sign In
 					</Text>
 				</Link>
+				<Link href={"/(tabs)"}>Home Page</Link>
 			</View>
 		</View>
 	);
