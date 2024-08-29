@@ -20,13 +20,25 @@ export class DatabaseHelper {
     };
   }
 
+  // Function to connect to the database
+  private async connectToDatabase(): Promise<sql.ConnectionPool> {
+    try {
+      const pool = await sql.connect(this.config);
+      //console.log('Connected to the database.');
+      return pool;
+    } catch (err) {
+      console.error('Database connection failed: ', err.message);
+      throw err;
+    }
+  }
+
   // Function to query the database
   // Function to query the database
   async queryDatabase(query: string): Promise<sql.IResult<any>> {
     let pool: sql.ConnectionPool | undefined;
     try {
-      //   pool = await this.connectToDatabase();
-      console.log('Reading rows from the Table...');
+      pool = await this.connectToDatabase();
+      //console.log('Reading rows from the Table...');
 
       // Perform the query and return the result set
       const resultSet = await pool.request().query(query);
