@@ -7,12 +7,20 @@ import { useState } from "react";
 // TODO: Need to add validation that the checkbox has been ticked
 
 export default function Signup() {
+	const fullNameRegex = /^[a-zA-Z']+(\s[a-zA-Z']+)*$/;
+	const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 	const [pressed, setPressed] = useState(false);
 
 	// User data states for pushing to API later
 	const [name, setName] = useState("");
+	const [nameIsValid, setNameValidity] = useState(true);
+
 	const [email, setEmail] = useState("");
+	const [emailIsValid, setEmailIsValid] = useState(true);
+
 	const [password, setPassword] = useState("");
+	const [passwordIsValid, setPasswordValidity] = useState(true);
 
 	const submit = () => {
 		console.log(
@@ -29,6 +37,11 @@ export default function Signup() {
 			.then((x) => x.json())
 			.then((x) => console.log(x))
 			.catch((err) => console.log(err));
+	const [checkboxIsChecked, setCheckbox] = useState(false);
+	const [toggleCheckMessage, setCheckMessage] = useState(false);
+
+	const [generalError, setError] = useState(true);
+
 	};
 
 	return (
