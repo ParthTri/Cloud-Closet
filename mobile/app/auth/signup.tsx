@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { useState } from "react";
 
@@ -109,18 +109,40 @@ export default function Signup() {
 				<View>
 					<Text style={styles.label}>Full name</Text>
 					<TextInput
-						style={styles.input}
+						style={{
+							...styles.input,
+							borderColor: nameIsValid ? "white" : "red",
+						}}
 						placeholder="Maggie"
 						onChangeText={(text) => setName(text)}
 					></TextInput>
+					<Text
+						style={{
+							...styles.errorText,
+							display: !nameIsValid ? "flex" : "none",
+						}}
+					>
+						Invalid Name. Name cannot contain numbers or special characters.
+					</Text>
 				</View>
 				<View>
 					<Text style={styles.label}>Email</Text>
 					<TextInput
-						style={styles.input}
+						style={{
+							...styles.input,
+							borderColor: emailIsValid ? "white" : "red",
+						}}
 						inputMode="email"
 						onChangeText={(text) => setEmail(text)}
 					></TextInput>
+					<Text
+						style={{
+							...styles.errorText,
+							display: !emailIsValid ? "flex" : "none",
+						}}
+					>
+						Invalid email. This email may already be in use.
+					</Text>
 				</View>
 				<View>
 					<Text style={styles.label}>Password</Text>
@@ -129,15 +151,43 @@ export default function Signup() {
 						secureTextEntry={true}
 						onChangeText={(text) => setPassword(text)}
 					></TextInput>
+					<Text
+						style={{
+							...styles.errorText,
+							display: !passwordIsValid ? "flex" : "none",
+						}}
+					>
+						Invalid password. Must be more than 6 characters.
+					</Text>
 				</View>
-				<View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+				<View
+					style={{
+						flexDirection: "row",
+						alignItems: "center",
+						flexWrap: "wrap",
+						gap: 10,
+					}}
+				>
 					<BouncyCheckbox
 						disableText
 						fillColor="#8ABAE3"
 						innerIconStyle={{ borderRadius: 0 }}
 						iconStyle={{ borderRadius: 0 }}
+						isChecked={checkboxIsChecked}
+						useBuiltInState={false}
+						onPress={(checked: boolean) => {
+							setCheckbox(!checkboxIsChecked);
+						}}
 					/>
 					<Text>I agree with the terms & conditions</Text>
+					<Text
+						style={{
+							...styles.errorText,
+							display: toggleCheckMessage ? "flex" : "none",
+						}}
+					>
+						This checkbox must be ticked in order to create an account.
+					</Text>
 				</View>
 			</View>
 			<Pressable
@@ -160,6 +210,14 @@ export default function Signup() {
 					Sign Up
 				</Text>
 			</Pressable>
+			<Text
+				style={{
+					...styles.errorText,
+					display: !generalError ? "flex" : "none",
+				}}
+			>
+				There was an error creating your account. Please try again later.
+			</Text>
 		</View>
 	);
 }
@@ -193,6 +251,8 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		padding: 10,
+		borderWidth: 2,
+		borderColor: "#fff",
 	},
 	button: {
 		padding: 10,
@@ -208,5 +268,10 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		alignSelf: "center",
 		color: "8ABAE3",
+	},
+	errorText: {
+		fontSize: 14,
+		color: "red",
+		fontStyle: "italic",
 	},
 });
