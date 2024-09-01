@@ -29,16 +29,24 @@ export class UserService {
     return this.userRepository.findOneBy({ userID: id });
   }
 
-  // TODO: Add input checking if email is already in use
-  async createUser(user: CreateUserDTO): Promise<string> {
+  async createUser(user: CreateUserDTO): Promise<string | any> {
     try {
+      // Check if email is in use. Otherwise return an error
+      const check = await this.userRepository.findBy({
+        email: user.Email,
+      });
+
+      if (check.length > 0) {
+        return { error: 'User email already in use' };
+      }
+
       const newUser: User = new User();
       newUser.email = user.Email;
       newUser.userName = user.Name;
       newUser.userPassword = await bcrypt.hashSync(user.Password, SALT_ROUNDS);
 
       const result: User = await this.userRepository.save(newUser);
-      return result.userID;
+      return { userID: result.userID };
     } catch (e) {
       console.log(e.message);
       throw e;
