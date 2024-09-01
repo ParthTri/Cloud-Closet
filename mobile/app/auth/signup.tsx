@@ -66,7 +66,7 @@ export default function Signup() {
 				return;
 			}
 
-			const data = await fetch("http://192.168.1.36:3000/api/user", {
+			const data = await fetch("http://cloudcloset.kolide.co.nz/api/user", {
 				method: "POST",
 				headers: {
 					Accept: "application/json",
