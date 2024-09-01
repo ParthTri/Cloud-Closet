@@ -22,26 +22,75 @@ export default function Signup() {
 	const [password, setPassword] = useState("");
 	const [passwordIsValid, setPasswordValidity] = useState(true);
 
-	const submit = () => {
-		console.log(
-			JSON.stringify({ Name: name, Email: email, Password: password })
-		);
-		fetch("http://cloudcloset.kolide.co.nz/api/user", {
-			method: "POST",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ Name: name, Email: email, Password: password }),
-		})
-			.then((x) => x.json())
-			.then((x) => console.log(x))
-			.catch((err) => console.log(err));
 	const [checkboxIsChecked, setCheckbox] = useState(false);
 	const [toggleCheckMessage, setCheckMessage] = useState(false);
 
 	const [generalError, setError] = useState(true);
 
+	const submit = async () => {
+		try {
+			let notPush = false;
+			// Check Full Name
+			if (!fullNameRegex.test(name)) {
+				setNameValidity(false);
+				notPush = true;
+			} else {
+				setNameValidity(true);
+			}
+
+			// Check Email formatting
+			if (!emailRegex.test(email)) {
+				setEmailIsValid(false);
+				notPush = true;
+			} else {
+				setEmailIsValid(true);
+			}
+
+			// Check Password
+			if (password.length < 6) {
+				setPasswordValidity(false);
+				notPush = true;
+			} else {
+				setPasswordValidity(true);
+			}
+
+			// Checkbox
+			if (!checkboxIsChecked) {
+				setCheckMessage(true);
+				notPush = true;
+			} else {
+				setCheckMessage(false);
+			}
+
+			if (notPush) {
+				return;
+			}
+
+			const data = await fetch("http://192.168.1.36:3000/api/user", {
+				method: "POST",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ Name: name, Email: email, Password: password }),
+			});
+			const json = await data.json();
+
+			// Handle email exists
+			if (
+				json["error"] == null &&
+				json["error"] == "User email already in use"
+			) {
+				setEmailIsValid(false);
+				return;
+			}
+
+			setError(true);
+			router.push("/(tabs)");
+		} catch (err) {
+			console.log(err);
+			setError(false);
+		}
 	};
 
 	return (
