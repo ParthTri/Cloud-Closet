@@ -16,9 +16,9 @@ export class Category {
   @Column()
   name: string;
 
-  @ManyToOne(() => User, (user) => user.categories)
-  @JoinColumn({ name: 'userID' })
-  user: User;
+  // @ManyToOne(() => User, (user) => user.categories)
+  // @JoinColumn({ name: 'userID' })
+  // user: User;
 
   @ManyToMany(() => Image, (image) => image.categories)
   images: Image[];

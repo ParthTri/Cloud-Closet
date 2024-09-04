@@ -19,6 +19,6 @@ export class User {
   @OneToMany(() => Image, (image) => image.user)
   images: Image[];
 
-  @OneToMany(() => Category, (category) => category.user)
-  categories: Category[];
+  // @OneToMany(() => Category, (category) => category.user)
+  // categories: Category[];
 }
