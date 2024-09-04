@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 
 import { useState } from "react";
 
@@ -14,21 +14,29 @@ export default function SignIn() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
-	const submit = () => {
-		console.log(
-			JSON.stringify({ Name: name, Email: email, Password: password })
-		);
-		fetch("http://cloudcloset.kolide.co.nz/api/user", {
-			method: "POST",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ Email: email, Password: password }),
-		})
-			.then((x) => x.json())
-			.then((x) => console.log(x))
-			.catch((err) => console.log(err));
+	const submit = async () => {
+		try {
+			const res = await fetch(
+				"https://cloudcloset.kolide.co.nz/api/user/signin",
+				{
+					method: "POST",
+					headers: {
+						Accept: "application/json",
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						email: email.toLocaleLowerCase(),
+						password: password,
+					}),
+				}
+			);
+			const json = await res.json();
+			if (json) {
+				router.push("/(tabs)");
+			}
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	return (
@@ -38,7 +46,7 @@ export default function SignIn() {
 			</Link>
 			<View style={styles.header}>
 				<Text style={{ fontSize: 24 }}>Sign In</Text>
-				<Text style={{ fontSize: 48, fontWeight: 'bold' }}>Welcome Back</Text>
+				<Text style={{ fontSize: 48, fontWeight: "bold" }}>Welcome Back</Text>
 				<Text style={{ fontSize: 18 }}>Please enter your account here</Text>
 			</View>
 			<View
@@ -52,7 +60,6 @@ export default function SignIn() {
 						placeholder="maggie@gmail.com"
 						onChangeText={(text) => setEmail(text)}
 					></TextInput>
-
 				</View>
 				<View>
 					<Text style={styles.label}>Password</Text>
@@ -119,8 +126,6 @@ export default function SignIn() {
 	);
 }
 
-
-
 const styles = StyleSheet.create({
 	page: {
 		flex: 1,
@@ -179,6 +184,6 @@ const styles = StyleSheet.create({
 	forgotButton: {
 		position: "absolute",
 		right: 0,
-		bottom: -30, 
+		bottom: -30,
 	},
 });
