@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Image } from './image.entity';
 import { User } from '../user/user.entity';
+import { Category } from '../category/category.entity';
 
 const USER_UPLOAD_CONTAINER = 'upload';
 import { v1 as uuidv1 } from 'uuid';
@@ -19,6 +20,9 @@ export class ImageService {
     @InjectRepository(Image)
     private imageRepository: Repository<Image>,
 
+    @InjectRepository(Category)
+    private categoryRepository : Repository<Category>,
+
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
@@ -26,7 +30,7 @@ export class ImageService {
   async uploadUserImage(
     image: Buffer,
     fileName: string,
-    categories: Array<bigint>,
+    categoryIds: Array<number>,
     userID: string,
   ): Promise<number> {
     // Upload user image
@@ -37,6 +41,7 @@ export class ImageService {
       blobName,
     );
     console.log(`Raw image url: ${imageUrl}`);
+    console.log(categoryIds);
 
     // Remove background and upload
     const blob = await removeBackground(imageUrl);
@@ -56,18 +61,24 @@ export class ImageService {
     newImage.user = user;
     const out = await this.imageRepository.save(newImage);
 
-    // TODO: Insert to ImageCategory database
-    // categories.forEach((element) => {
-    //   const insertImageCategoryCommand = `INSERT INTO [dbo].[ImageCategory]
-    //           ([ImageId]
-    //           ,[CategoryId])
-    //     VALUES
-    //           (${newImage[0].Id}
-    //           ,${element})`;
+  // Insert categories
+  // Convert the array of numbers to an array of BigInt for comparison
+  const bigIntCategoriesId = categoryIds.map(cat => BigInt(cat));
+    
 
-    //   this.databaseHelper.queryDatabase(insertImageCategoryCommand);
-    // });
+    //TODO: Insert to ImageCategory database
+          for(const element of categoryIds)
+      {
+        const insertImageCategoryCommand = `INSERT INTO [dbo].[ImageCategory]
+        ([ImageId]
+        ,[CategoryId])
+  VALUES
+        (${out.imageID}
+        ,${element})`;
 
+      this.databaseHelper.queryDatabase(insertImageCategoryCommand);
+      }    
+    
     return out.imageID;
   }
 
@@ -109,4 +120,58 @@ export class ImageService {
 
     return foundImages;
   }
+  
+  async searchImageByKeyWord(keyword: string, userId): Promise<Array<Image>> {
+    try {
+        let searchResult = new Array<Image>();
+
+        const allUserimages = await this.getImagesByUserId(userId);
+
+        for (const image of allUserimages) {
+            // Check if any category name matches the keyword
+            let hasKeyword = false;
+            for (const cat of image.categories) {
+                if (cat.name.toLocaleLowerCase().includes(keyword.toLowerCase())) {
+                    hasKeyword = true;
+                    break;
+                }
+            }
+            if (hasKeyword) {
+                searchResult.push(image);
+            }
+        }
+        return searchResult;
+    } catch (error) {
+        console.error("Error finding images by keyword:", error);
+        throw new Error("Error finding images by keyword");
+    }
+}
+
+async filterImageByCategory(categories: Array<number>, userId): Promise<Array<Image>> {
+  let filterResult = new Array<Image>();
+
+  const allUserimages = await this.getImagesByUserId(userId);
+
+  console.log(allUserimages);
+
+  // Convert the array of numbers to an array of BigInt for comparison
+  const bigIntCategories = categories.map(cat => BigInt(cat));
+
+  // Iterate over all user images
+  for (const image of allUserimages) {
+      // Check if any category id of the image matches the provided categories
+      let hasCategory = false;
+      for (const cat of image.categories) {
+          if (categories.includes(Number(cat.categoryID))) {
+              hasCategory = true;
+              break;
+          }
+      }
+      if (hasCategory) {
+          filterResult.push(image);
+      }
+  }
+  return filterResult;
+}
+
 }
