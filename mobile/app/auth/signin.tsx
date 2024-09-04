@@ -2,6 +2,8 @@ import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Link, router } from "expo-router";
 
+import ErrorText from "@/components/ErrorText";
+
 import { useState } from "react";
 
 export default function SignIn() {
@@ -13,6 +15,8 @@ export default function SignIn() {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+
+	const [showError, setShowError] = useState(false);
 
 	const submit = async () => {
 		try {
@@ -32,9 +36,13 @@ export default function SignIn() {
 			);
 			const json = await res.json();
 			if (json) {
+				setShowError(false);
 				router.push("/(tabs)");
+			} else {
+				setShowError(true);
 			}
 		} catch (error) {
+			setShowError(true);
 			console.log(error);
 		}
 	};
@@ -69,6 +77,9 @@ export default function SignIn() {
 						onChangeText={(text) => setPassword(text)}
 					></TextInput>
 				</View>
+				<ErrorText isValid={showError}>
+					Incorrect username or password.
+				</ErrorText>
 				<View style={styles.linksContainer}>
 					<Pressable
 						onPressIn={() => setForgotPressed(true)}
