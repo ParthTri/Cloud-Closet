@@ -1,6 +1,7 @@
+import ClosetItem from "@/components/ClosetItem";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 
 function getValueFor(key: string): string | null {
 	return SecureStore.getItem(key);
@@ -18,24 +19,25 @@ async function getUserItems(userID: string | null): Promise<any[]> {
 		},
 	});
 	const json = await data.json();
-	console.log(json);
 	return json;
 }
 
 export default function Closet() {
 	const userID: string | null = getValueFor("userID");
-	console.log(userID);
 	const [items, setItems] = useState<any[]>([{}]);
 	useEffect(() => {
 		getUserItems(userID).then((x) => setItems(x));
-		console.log(items);
 	}, []);
 
 	return (
-		<View>
+		<ScrollView>
 			{items.map((element) => (
-				<Text key={element.imageID}>{element["imageID"]}</Text>
+				<ClosetItem
+					id={element["userID"]}
+					url={element["rawUrl"]}
+					categories={element["categories"]}
+				/>
 			))}
-		</View>
+		</ScrollView>
 	);
 }
