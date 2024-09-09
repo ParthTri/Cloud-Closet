@@ -1,4 +1,4 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 
 interface Category {
 	categoryID: number;
@@ -13,9 +13,9 @@ interface ItemProps {
 
 export default function ClosetItem({ id, url, categories }: ItemProps) {
 	return (
-		<View>
+		<View style={styles.container}>
 			<Text>{id}</Text>
-			<Image source={{ uri: url }} style={{ height: 200, width: 200 }} />
+			<Image source={{ uri: url }} style={styles.image} />
 			<View>
 				{categories == undefined
 					? ""
@@ -26,3 +26,19 @@ export default function ClosetItem({ id, url, categories }: ItemProps) {
 		</View>
 	);
 }
+
+const styles = StyleSheet.create({
+	container: {
+		width: "45%",
+		borderColor: "#D7AF9D",
+		borderWidth: 2,
+		margin: 10,
+		alignItems: "center",
+		borderRadius: 10,
+		minHeight: 250,
+	},
+	image: {
+		width: 150,
+		height: 150,
+	},
+});
