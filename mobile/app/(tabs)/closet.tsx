@@ -49,3 +49,16 @@ export default function Closet() {
 		</View>
 	);
 }
+
+const styles = StyleSheet.create({
+	itemContainer: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		width: "100%",
+		flex: 1,
+	},
+	row: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+	},
+});
