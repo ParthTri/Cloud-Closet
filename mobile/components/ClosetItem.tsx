@@ -1,4 +1,5 @@
 import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
+import ItemCategory from "./ItemCategory";
 
 interface Category {
 	categoryID: number;
@@ -20,7 +21,7 @@ export default function ClosetItem({ id, url, categories }: ItemProps) {
 				{categories == undefined
 					? ""
 					: categories.map((val) => (
-							<Text key={val.categoryID}>{val.name}</Text>
+							<ItemCategory categoryID={val.categoryID} name={val.name} />
 					  ))}
 			</View>
 		</View>
