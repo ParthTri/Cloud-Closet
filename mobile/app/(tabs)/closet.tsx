@@ -31,6 +31,7 @@ export default function Closet() {
 
 	return (
 		<View>
+			{/* TODO: Search bar */}
 			<Suspense fallback={<Text>Loading...</Text>}>
 				<FlatList
 					data={items}
