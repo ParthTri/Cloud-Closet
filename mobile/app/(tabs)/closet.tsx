@@ -1,7 +1,7 @@
 import ClosetItem from "@/components/ClosetItem";
 import * as SecureStore from "expo-secure-store";
-import { useEffect, useState } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { Suspense, useEffect, useState } from "react";
+import { View, StyleSheet, Text, FlatList } from "react-native";
 
 function getValueFor(key: string): string | null {
 	return SecureStore.getItem(key);
@@ -30,14 +30,22 @@ export default function Closet() {
 	}, []);
 
 	return (
-		<ScrollView>
-			{items.map((element) => (
-				<ClosetItem
-					id={element["userID"]}
-					url={element["rawUrl"]}
-					categories={element["categories"]}
+		<View>
+			<Suspense fallback={<Text>Loading...</Text>}>
+				<FlatList
+					data={items}
+					keyExtractor={(item) => item["id"]}
+					numColumns={2}
+					columnWrapperStyle={styles.row}
+					renderItem={({ item }) => (
+						<ClosetItem
+							id={item["userID"]}
+							url={item["rawUrl"]}
+							categories={item["categories"]}
+						/>
+					)}
 				/>
-			))}
-		</ScrollView>
+			</Suspense>
+		</View>
 	);
 }
