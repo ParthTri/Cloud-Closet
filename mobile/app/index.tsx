@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { Logo } from '@/components/Logo';
 import { Link } from 'expo-router';
-import { useAuth } from './authContext'; // Adjust path as needed
+{/*import { useAuth } from './authContext'; */}
 
 const HomeScreen: React.FC = () => {
 
@@ -16,6 +16,7 @@ const HomeScreen: React.FC = () => {
         <Link
           href="/auth/signin"
           style={[styles.link, styles.signInLink]}
+		  
         >
           <Text style={[styles.text, styles.signInText]}>Sign In</Text>
         </Link>

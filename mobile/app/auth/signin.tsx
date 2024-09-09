@@ -1,11 +1,7 @@
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-<<<<<<< Updated upstream
-import { Link } from "expo-router";
-=======
 import { Link, router } from "expo-router";
-import ErrorText from "@/components/ErrorText";
->>>>>>> Stashed changes
+{/*import ErrorText from "@/components/ErrorText";*/}
 
 import React, { useState } from "react";
 import { useAuth } from "../authContext";
@@ -22,23 +18,6 @@ export default function SignIn() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
-<<<<<<< Updated upstream
-	const submit = () => {
-		console.log(
-			JSON.stringify({ Name: name, Email: email, Password: password })
-		);
-		fetch("http://cloudcloset.kolide.co.nz/api/user", {
-			method: "POST",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ Email: email, Password: password }),
-		})
-			.then((x) => x.json())
-			.then((x) => console.log(x))
-			.catch((err) => console.log(err));
-=======
 	const [showError, setShowError] = useState(false);
 
 	const submit = async () => {
@@ -70,7 +49,6 @@ export default function SignIn() {
 			setShowError(true);
 			console.log(error);
 		}
->>>>>>> Stashed changes
 	};
 
 	return (
