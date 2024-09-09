@@ -24,7 +24,7 @@ export class UserController {
   }
 
   @Post('/signin')
-  async signIn(@Body() userData: UserSignIn): Promise<boolean> {
+  async signIn(@Body() userData: UserSignIn): Promise<any> {
     return this.userService.authenticateUser(userData);
   }
 }

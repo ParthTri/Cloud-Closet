@@ -1,10 +1,18 @@
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
+<<<<<<< Updated upstream
 import { Link } from "expo-router";
+=======
+import { Link, router } from "expo-router";
+import ErrorText from "@/components/ErrorText";
+>>>>>>> Stashed changes
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { useAuth } from "../authContext";
 
 export default function SignIn() {
+	const { login } = useAuth(); // Get login function from AuthContext
+
 	const [pressed, setPressed] = useState(false);
 	const [forgotPressed, setForgotPressed] = useState(false);
 	const [signUpPressed, setSignUpPressed] = useState(false);
@@ -14,6 +22,7 @@ export default function SignIn() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
+<<<<<<< Updated upstream
 	const submit = () => {
 		console.log(
 			JSON.stringify({ Name: name, Email: email, Password: password })
@@ -29,6 +38,39 @@ export default function SignIn() {
 			.then((x) => x.json())
 			.then((x) => console.log(x))
 			.catch((err) => console.log(err));
+=======
+	const [showError, setShowError] = useState(false);
+
+	const submit = async () => {
+		try {
+			const res = await fetch(
+				"http://192.168.1.21:3000/api/user/signin",
+				{
+					method: "POST",
+					headers: {
+						Accept: "application/json",
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						email: email.toLocaleLowerCase(),
+						password: password,
+					}),
+				}
+			);
+			const json = await res.json();
+			if (json) {
+				// Assuming json.user contains user data
+  				setShowError(false);
+  				login(json); // Update AuthContext with logged-in user data
+  				router.push("../(tabs)");
+			} else {
+				setShowError(true);
+			}
+		} catch (error) {
+			setShowError(true);
+			console.log(error);
+		}
+>>>>>>> Stashed changes
 	};
 
 	return (
@@ -78,21 +120,22 @@ export default function SignIn() {
 							Forgot password?
 						</Text>
 					</Pressable>
+					
 					<Pressable
-						onPressIn={() => setSignUpPressed(true)}
-						onPressOut={() => setSignUpPressed(false)}
-					>
-						<Text
-							style={[
-								styles.linkText,
-								{
-									textDecorationLine: signUpPressed ? "underline" : "none",
-								},
-							]}
-						>
-							<Link href="/auth/signup">Don't have an account? Sign Up</Link>
-						</Text>
-					</Pressable>
+            			onPressIn={() => setSignUpPressed(true)}
+            			onPressOut={() => setSignUpPressed(false)}
+          				>
+            			<Text
+              				style={[
+                				styles.linkText,
+                				{ textDecorationLine: signUpPressed ? "underline" : "none" },
+              				]}
+            			>
+              				<Link href="/auth/signup">Don't have an account? Sign Up</Link>
+            			</Text>
+          			</Pressable>
+
+
 				</View>
 			</View>
 			<Pressable

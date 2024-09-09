@@ -1,6 +1,8 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useAuth } from "../authContext";
 
-export default function Home() {
+export default function HomePage() {
+	const { user, logout } = useAuth();// Get user data from AuthContext
 	return (
 		<View>
 			<View
@@ -17,6 +19,14 @@ export default function Home() {
 				<View>
 					<Text>Recommended Outfit</Text>
 				</View>
+
+				{/* Display User Information */}
+				{user ? (
+          			<Text>Welcome, {user.userName}</Text> // Assuming user object has a name property
+        		) : (
+          			<Text>Please sign in</Text>
+        		)}
+
 				<Pressable>
 					<Text>GENERATE OUTFIT</Text>
 				</Pressable>

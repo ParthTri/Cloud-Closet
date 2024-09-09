@@ -19,11 +19,12 @@ export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  //@UseInterceptors(FileInterceptor('image'))
   async uploadImage(
-    @UploadedFile() file: Express.Multer.File,
+    //@UploadedFile() file: Express.Multer.File,
     //@Body() body: UploadImage,
-   @Body('fileName') fileName: string, @Body('categories') categories: string, @Body('userID') userID: string
+   @Body('fileName') fileName: string, @Body('categories') categories: string, 
+   @Body('userID') userID: string, @Body('image') image: string
   ): Promise<any> {
     console.log(fileName);
     console.log(categories);
@@ -36,7 +37,7 @@ export class ImageController {
     }
 
     const imageID = await this.imageService.uploadUserImage(
-      file.buffer,
+      image,
       fileName,
       categoriesArray,
       userID,
