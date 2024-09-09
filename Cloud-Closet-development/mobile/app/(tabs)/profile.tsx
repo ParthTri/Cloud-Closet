@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Button } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-
+// 导航其他页面创建按钮
 
 type RootStackParamList = {
   Profile: undefined;
