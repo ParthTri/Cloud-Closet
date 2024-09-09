@@ -25,17 +25,25 @@ export class StorageHelper {
     if (fileType == 'jpg') {
       fileType = 'jpeg;';
     }
+    console.log("File type: " + fileType);
     const blobOptions = {
       blobHTTPHeaders: { blobContentType: `image/${fileType}` },
     };
 
     // Upload data to the blob
     if (image instanceof Blob) {
+      console.log("Image is a Blob");
       const arrayBuffer = await image.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
       await blockBlobClient.uploadData(buffer, blobOptions);
+    } else if (image instanceof Buffer) {
+      console.log("Image is a Buffer string");
+      await blockBlobClient.uploadData(image, blobOptions);
     } else {
-      await blockBlobClient.upload(image, image.length);
+      console.log("Image is a base64 string");
+      let matchesBlobImg = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      let imgBuffer = Buffer.from(matchesBlobImg[2], 'base64');
+      await blockBlobClient.uploadData(imgBuffer, blobOptions);
     }
     return blockBlobClient.url;
   }

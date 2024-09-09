@@ -4,9 +4,12 @@ import { Link, router } from "expo-router";
 
 import ErrorText from "@/components/ErrorText";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { useAuth } from "../authContext";
 
 export default function SignIn() {
+	const { login } = useAuth(); // Get login function from AuthContext
+
 	const [pressed, setPressed] = useState(false);
 	const [forgotPressed, setForgotPressed] = useState(false);
 	const [signUpPressed, setSignUpPressed] = useState(false);
@@ -36,8 +39,10 @@ export default function SignIn() {
 			);
 			const json = await res.json();
 			if (json) {
-				setShowError(false);
-				router.push("/(tabs)");
+				// Assuming json.user contains user data
+  				setShowError(false);
+  				login(json); // Update AuthContext with logged-in user data
+  				router.push("../(tabs)");
 			} else {
 				setShowError(true);
 			}
@@ -96,21 +101,22 @@ export default function SignIn() {
 							Forgot password?
 						</Text>
 					</Pressable>
+					
 					<Pressable
-						onPressIn={() => setSignUpPressed(true)}
-						onPressOut={() => setSignUpPressed(false)}
-					>
-						<Text
-							style={[
-								styles.linkText,
-								{
-									textDecorationLine: signUpPressed ? "underline" : "none",
-								},
-							]}
-						>
-							<Link href="/auth/signup">Don't have an account? Sign Up</Link>
-						</Text>
-					</Pressable>
+            			onPressIn={() => setSignUpPressed(true)}
+            			onPressOut={() => setSignUpPressed(false)}
+          				>
+            			<Text
+              				style={[
+                				styles.linkText,
+                				{ textDecorationLine: signUpPressed ? "underline" : "none" },
+              				]}
+            			>
+              				<Link href="/auth/signup">Don't have an account? Sign Up</Link>
+            			</Text>
+          			</Pressable>
+
+
 				</View>
 			</View>
 			<Pressable

@@ -28,13 +28,14 @@ export class ImageService {
   ) {}
 
   async uploadUserImage(
-    image: Buffer,
+    image: any,
     fileName: string,
     categoryIds: Array<number>,
     userID: string,
   ): Promise<number> {
     // Upload user image
     let blobName = `raw-${uuidv1()}.${fileName.split('.')[1]}`;
+    console.log("Raw blob name" + blobName);
     const imageUrl = await this.storageHelper.uploadImage(
       image,
       USER_UPLOAD_CONTAINER,
@@ -46,6 +47,7 @@ export class ImageService {
     // Remove background and upload
     const blob = await removeBackground(imageUrl);
     blobName = `processed-${uuidv1()}.png`;
+    console.log(blobName);
     const processedUrl = await this.storageHelper.uploadImage(
       blob,
       USER_UPLOAD_CONTAINER,

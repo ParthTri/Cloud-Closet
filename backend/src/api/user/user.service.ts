@@ -53,7 +53,7 @@ export class UserService {
     }
   }
 
-  async authenticateUser(user: UserSignIn): Promise<boolean> {
+  async authenticateUser(user: UserSignIn): Promise<any> {
     try {
       const foundUser = await this.userRepository.findOneByOrFail({
         email: user.email,
@@ -64,7 +64,11 @@ export class UserService {
         foundUser.userPassword,
       );
 
-      return result;
+      return {
+        "email": foundUser.email,
+        "userName": foundUser.userName,
+        "userID": foundUser.userID
+      };
     } catch (e) {
       return false;
     }
