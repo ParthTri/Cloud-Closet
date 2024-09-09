@@ -16,7 +16,7 @@ export default function ClosetItem({ id, url, categories }: ItemProps) {
 		<View style={styles.container}>
 			<Text>{id}</Text>
 			<Image source={{ uri: url }} style={styles.image} />
-			<View>
+			<View style={styles.category}>
 				{categories == undefined
 					? ""
 					: categories.map((val) => (
@@ -34,11 +34,16 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		margin: 10,
 		alignItems: "center",
-		borderRadius: 10,
+		borderRadius: 20,
 		minHeight: 250,
+		justifyContent: "center",
+		padding: 5,
 	},
 	image: {
 		width: 150,
 		height: 150,
+	},
+	category: {
+		flexDirection: "row",
 	},
 });
