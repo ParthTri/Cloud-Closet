@@ -1,29 +1,29 @@
 import ClosetItem from "@/components/ClosetItem";
-import * as SecureStore from "expo-secure-store";
 import { Suspense, useEffect, useState } from "react";
 import { View, StyleSheet, Text, FlatList } from "react-native";
+import { useAuth } from "../authContext";
 
-function getValueFor(key: string): string | null {
-	return SecureStore.getItem(key);
-}
-
-async function getUserItems(userID: string | null): Promise<any[]> {
-	if (userID == null) {
+async function getUserItems(userID: string | undefined): Promise<any[]> {
+	if (userID == undefined) {
 		return [{}];
 	}
-	const data = await fetch(`http://192.168.1.36:3000/api/image/${userID}`, {
-		method: "GET",
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json",
-		},
-	});
+	const data = await fetch(
+		`http://cloudcloset.kolide.co.nz/api/image/${userID}`,
+		{
+			method: "GET",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+		}
+	);
 	const json = await data.json();
 	return json;
 }
 
 export default function Closet() {
-	const userID: string | null = getValueFor("userID");
+	const { user } = useAuth();
+	const userID: string | undefined = user?.userID;
 	const [items, setItems] = useState<any[]>([{}]);
 	useEffect(() => {
 		getUserItems(userID).then((x) => setItems(x));
