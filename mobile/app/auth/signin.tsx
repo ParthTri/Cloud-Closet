@@ -42,9 +42,9 @@ export default function SignIn() {
 			const json = await res.json();
 			if (json) {
 				// Assuming json.user contains user data
-  				setShowError(false);
-  				login(json); // Update AuthContext with logged-in user data
-  				router.push("../(tabs)");
+				setShowError(false);
+				login(json); // Update AuthContext with logged-in user data
+				router.push("../(tabs)");
 			} else {
 				setShowError(true);
 			}
@@ -55,7 +55,7 @@ export default function SignIn() {
 	};
 
 	return (
-		<View style={{ flex: 1, padding: 10 }}>
+		<View style={{ flex: 1, padding: 10, backgroundColor: "#fff" }}>
 			<Link href="/" style={styles.back} asChild>
 				<AntDesign name="leftcircleo" size={30} color="black" />
 			</Link>
@@ -103,22 +103,20 @@ export default function SignIn() {
 							Forgot password?
 						</Text>
 					</Pressable>
-					
+
 					<Pressable
-            			onPressIn={() => setSignUpPressed(true)}
-            			onPressOut={() => setSignUpPressed(false)}
-          				>
-            			<Text
-              				style={[
-                				styles.linkText,
-                				{ textDecorationLine: signUpPressed ? "underline" : "none" },
-              				]}
-            			>
-              				<Link href="/auth/signup">Don't have an account? Sign Up</Link>
-            			</Text>
-          			</Pressable>
-
-
+						onPressIn={() => setSignUpPressed(true)}
+						onPressOut={() => setSignUpPressed(false)}
+					>
+						<Text
+							style={[
+								styles.linkText,
+								{ textDecorationLine: signUpPressed ? "underline" : "none" },
+							]}
+						>
+							<Link href="/auth/signup">Don't have an account? Sign Up</Link>
+						</Text>
+					</Pressable>
 				</View>
 			</View>
 			<Pressable
