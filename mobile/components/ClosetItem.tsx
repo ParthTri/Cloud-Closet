@@ -1,5 +1,7 @@
-import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import ItemCategory from "./ItemCategory";
+import { useState } from "react";
+import ItemModal from "./ItemModel";
 
 interface Category {
 	categoryID: number;
@@ -13,18 +15,28 @@ interface ItemProps {
 }
 
 export default function ClosetItem({ id, url, categories }: ItemProps) {
+	const [show, setShow] = useState(false);
+
 	return (
-		<View style={styles.container}>
-			<Text>{id}</Text>
-			<Image source={{ uri: url }} style={styles.image} />
-			<View style={styles.category}>
-				{categories == undefined
-					? ""
-					: categories.map((val) => (
-							<ItemCategory categoryID={val.categoryID} name={val.name} />
-					  ))}
+		<Pressable onPress={() => setShow((x) => !x)} style={styles.container}>
+			<ItemModal
+				show={show}
+				setShow={setShow}
+				imageURL={url}
+				catergories={categories}
+			/>
+			<View>
+				<Text>{id}</Text>
+				<Image source={{ uri: url }} style={styles.image} />
+				<View style={styles.category}>
+					{categories == undefined
+						? ""
+						: categories.map((val) => (
+								<ItemCategory categoryID={val.categoryID} name={val.name} />
+						  ))}
+				</View>
 			</View>
-		</View>
+		</Pressable>
 	);
 }
 
@@ -39,6 +51,7 @@ const styles = StyleSheet.create({
 		minHeight: 250,
 		justifyContent: "center",
 		padding: 5,
+		zIndex: 2,
 	},
 	image: {
 		width: 150,
