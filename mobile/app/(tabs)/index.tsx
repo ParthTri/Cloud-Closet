@@ -8,7 +8,7 @@ export default function HomePage() {
 			<View
 				style={{
 					alignItems: "center",
-				}}
+        }} 
 			>
 				<Text style={styles.header}>Cloud Closet</Text>
 				{/* Weather component */}
