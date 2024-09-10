@@ -20,6 +20,7 @@ export default function ClosetItem({ id, url, categories }: ItemProps) {
 	return (
 		<Pressable onPress={() => setShow((x) => !x)} style={styles.container}>
 			<ItemModal
+				itemID={id}
 				show={show}
 				setShow={setShow}
 				imageURL={url}
