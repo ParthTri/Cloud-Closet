@@ -12,6 +12,12 @@ interface ModalProps {
 	catergories: Category[] | undefined;
 }
 
+async function deleteItem(itemID: string): Promise<boolean> {
+	console.log(`Deleted ${itemID}`);
+
+	return false;
+}
+
 export default function ItemModal({
 	itemID,
 	show,
