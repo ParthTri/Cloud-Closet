@@ -1,25 +1,23 @@
 import React from 'react';
 import { View, Button } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-// 导航其他页面创建按钮
 
 type RootStackParamList = {
   Profile: undefined;
   Welcome: undefined;
+  index: undefined;
 };
 
 export default function Profile() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const goToWelcome = () => {
-    // 导航到欢迎界面的逻辑
-    navigation.navigate('Welcome');
+  const goToHome = () => {
+    navigation.navigate('index');
   };
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      {/* I created a button that returns */}
-      <Button title="log out" onPress={goToWelcome}  color="red"/>
+      <Button title="Log out" onPress={goToHome} color="red" />
     </View>
   );
 }
