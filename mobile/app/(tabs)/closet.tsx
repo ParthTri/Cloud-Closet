@@ -11,20 +11,36 @@ import {
 import { useAuth } from "../authContext";
 import Feather from "@expo/vector-icons/Feather";
 
-async function getUserItems(userID: string | undefined): Promise<any[]> {
+async function getUserItems(
+	userID: string | undefined,
+	filter: string
+): Promise<any[]> {
 	if (userID == undefined) {
 		return [{}];
 	}
-	const data = await fetch(
-		`http://cloudcloset.kolide.co.nz/api/image/${userID}`,
-		{
+	let data;
+	console.log(filter.length);
+	if (filter.length == 0) {
+		data = await fetch(`http://cloudcloset.kolide.co.nz/api/image/${userID}`, {
 			method: "GET",
 			headers: {
 				Accept: "application/json",
 				"Content-Type": "application/json",
 			},
-		}
-	);
+		});
+	} else {
+		data = await fetch(
+			`http://cloudcloset.kolide.co.nz/api/image/search/${userID}/${filter}`,
+			{
+				method: "GET",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+			}
+		);
+	}
+
 	const json = await data.json();
 	return json;
 }
