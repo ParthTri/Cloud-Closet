@@ -58,7 +58,7 @@ export default function Closet() {
 	};
 
 	useEffect(() => {
-		getUserItems(userID).then((x) => setItems(x));
+		getUserItems(userID, "").then((x) => setItems(x["data"]));
 	}, []);
 
 	return (
