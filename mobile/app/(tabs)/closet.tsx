@@ -1,7 +1,15 @@
 import ClosetItem from "@/components/ClosetItem";
 import { Suspense, useEffect, useState } from "react";
-import { View, StyleSheet, Text, FlatList } from "react-native";
+import {
+	View,
+	StyleSheet,
+	Text,
+	FlatList,
+	TextInput,
+	Pressable,
+} from "react-native";
 import { useAuth } from "../authContext";
+import Feather from "@expo/vector-icons/Feather";
 
 async function getUserItems(userID: string | undefined): Promise<any[]> {
 	if (userID == undefined) {
@@ -30,8 +38,27 @@ export default function Closet() {
 	}, []);
 
 	return (
-		<View>
-			{/* TODO: Search bar */}
+		<View
+			style={{
+				backgroundColor: "#fff",
+			}}
+		>
+			{/* Search bar */}
+			<View
+				style={{
+					flexDirection: "row",
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<TextInput
+					style={styles.searchBar}
+					onChangeText={(text) => setSearch(text)}
+				></TextInput>
+				<Pressable onPress={() => searchForItem(search)}>
+					<Feather name="search" size={31} color="black" />
+				</Pressable>
+			</View>
 			<Suspense fallback={<Text>Loading...</Text>}>
 				<FlatList
 					data={items}
@@ -61,5 +88,16 @@ const styles = StyleSheet.create({
 	row: {
 		flexDirection: "row",
 		justifyContent: "space-between",
+	},
+	searchBar: {
+		width: "80%",
+		height: 64,
+		backgroundColor: "#F1F1F1",
+		borderRadius: 15,
+		color: "#000",
+		fontSize: 24,
+		alignItems: "center",
+		justifyContent: "center",
+		padding: 10,
 	},
 });
