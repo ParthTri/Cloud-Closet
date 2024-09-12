@@ -56,8 +56,8 @@ export class ImageController {
   }
 
   @Get(':userId')
-  async getImagesByUserId(@Param('userId') userId: string): Promise<Image[]> {
-    return await this.imageService.getImagesByUserId(userId);
+  async getImagesByUserId(@Param('userId') userId: string): Promise<any> {
+    return { data: await this.imageService.getImagesByUserId(userId) };
   }
 
   @Get('/search/:userId/:keyword')
