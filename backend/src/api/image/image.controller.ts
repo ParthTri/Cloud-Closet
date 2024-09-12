@@ -23,16 +23,20 @@ export class ImageController {
   async uploadImage(
     //@UploadedFile() file: Express.Multer.File,
     //@Body() body: UploadImage,
-   @Body('fileName') fileName: string, @Body('categories') categories: string, 
-   @Body('userID') userID: string, @Body('image') image: string
+    @Body('fileName') fileName: string,
+    @Body('categories') categories: string,
+    @Body('userID') userID: string,
+    @Body('image') image: string,
   ): Promise<any> {
     console.log(fileName);
     console.log(categories);
     console.log(userID);
 
     // Convert the comma-separated list of categories into an array of numbers
-    const categoriesArray = categories.split(',').map(category => Number(category));
-    for(const el of categoriesArray){
+    const categoriesArray = categories
+      .split(',')
+      .map((category) => Number(category));
+    for (const el of categoriesArray) {
       console.log(el);
     }
 
@@ -56,26 +60,37 @@ export class ImageController {
     return await this.imageService.getImagesByUserId(userId);
   }
 
-  @Get("/search/:userId/:keyword")
-  async searchImageByKeyWord(@Param('userId') userId, @Param('keyword') keyword: string): Promise<any> {
+  @Get('/search/:userId/:keyword')
+  async searchImageByKeyWord(
+    @Param('userId') userId,
+    @Param('keyword') keyword: string,
+  ): Promise<any> {
     const data = await this.imageService.searchImageByKeyWord(keyword, userId);
 
     return {
-      "statusCode": HttpStatus.OK,
-      "data": data
+      statusCode: HttpStatus.OK,
+      data: data,
     };
   }
 
-  @Get("/filter/:userId/:categories")
-  async filterImageByCategory(@Param('userId') userId, @Param('categories') categories: string): Promise<any> {
+  @Get('/filter/:userId/:categories')
+  async filterImageByCategory(
+    @Param('userId') userId,
+    @Param('categories') categories: string,
+  ): Promise<any> {
     // Convert the comma-separated list of categories into an array of numbers
-    const categoriesArray = categories.split(',').map(category => Number(category));
-    
-    const data = await this.imageService.filterImageByCategory(categoriesArray, userId);
+    const categoriesArray = categories
+      .split(',')
+      .map((category) => Number(category));
+
+    const data = await this.imageService.filterImageByCategory(
+      categoriesArray,
+      userId,
+    );
 
     return {
-      "statusCode": HttpStatus.OK,
-      "data": data
+      statusCode: HttpStatus.OK,
+      data: data,
     };
   }
 }
