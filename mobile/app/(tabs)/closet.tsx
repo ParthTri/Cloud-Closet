@@ -1,41 +1,92 @@
 import ClosetItem from "@/components/ClosetItem";
 import { Suspense, useEffect, useState } from "react";
-import { View, StyleSheet, Text, FlatList } from "react-native";
+import {
+	View,
+	StyleSheet,
+	Text,
+	FlatList,
+	TextInput,
+	Pressable,
+} from "react-native";
 import { useAuth } from "../authContext";
+import Feather from "@expo/vector-icons/Feather";
 
-async function getUserItems(userID: string | undefined): Promise<any[]> {
+async function getUserItems(
+	userID: string | undefined,
+	filter: string
+): Promise<any[]> {
 	if (userID == undefined) {
 		return [{}];
 	}
-	const data = await fetch(
-		`http://cloudcloset.kolide.co.nz/api/image/${userID}`,
-		{
+	let data;
+	console.log(filter.length);
+	if (filter.length == 0) {
+		data = await fetch(`http://cloudcloset.kolide.co.nz/api/image/${userID}`, {
 			method: "GET",
 			headers: {
 				Accept: "application/json",
 				"Content-Type": "application/json",
 			},
-		}
-	);
+		});
+	} else {
+		data = await fetch(
+			`http://cloudcloset.kolide.co.nz/api/image/search/${userID}/${filter}`,
+			{
+				method: "GET",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+			}
+		);
+	}
+
 	const json = await data.json();
 	return json;
 }
 
 export default function Closet() {
+	const [search, setSearch] = useState<string>("");
 	const { user } = useAuth();
 	const userID: string | undefined = user?.userID;
 	const [items, setItems] = useState<any[]>([{}]);
+
+	const searchForItem = async (search: string) => {
+		await getUserItems(userID, search).then((x) => {
+			setItems(x["data"]);
+		});
+	};
+
 	useEffect(() => {
-		getUserItems(userID).then((x) => setItems(x));
+		getUserItems(userID, "").then((x) => setItems(x["data"]));
 	}, []);
 
 	return (
-		<View>
-			{/* TODO: Search bar */}
+		<View
+			style={{
+				backgroundColor: "#fff",
+			}}
+		>
+			{/* Search bar */}
+			<View
+				style={{
+					flexDirection: "row",
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<TextInput
+					style={styles.searchBar}
+					onChangeText={(text) => setSearch(text)}
+				></TextInput>
+				<Pressable onPress={() => searchForItem(search)}>
+					<Feather name="search" size={31} color="black" />
+				</Pressable>
+			</View>
 			<Suspense fallback={<Text>Loading...</Text>}>
 				<FlatList
 					data={items}
-					keyExtractor={(item) => item["id"]}
+					keyExtractor={(item) => item["imageID"]}
 					numColumns={2}
 					columnWrapperStyle={styles.row}
 					renderItem={({ item }) => (
@@ -61,5 +112,16 @@ const styles = StyleSheet.create({
 	row: {
 		flexDirection: "row",
 		justifyContent: "space-between",
+	},
+	searchBar: {
+		width: "80%",
+		height: 64,
+		backgroundColor: "#F1F1F1",
+		borderRadius: 15,
+		color: "#000",
+		fontSize: 24,
+		alignItems: "center",
+		justifyContent: "center",
+		padding: 10,
 	},
 });

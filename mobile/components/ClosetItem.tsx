@@ -27,7 +27,6 @@ export default function ClosetItem({ id, url, categories }: ItemProps) {
 				catergories={categories}
 			/>
 			<View>
-				<Text>{id}</Text>
 				<Image source={{ uri: url }} style={styles.image} />
 				<View style={styles.category}>
 					{categories == undefined

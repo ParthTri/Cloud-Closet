@@ -28,17 +28,20 @@ export default function SignIn() {
 
 	const submit = async () => {
 		try {
-			const res = await fetch("http://192.168.1.36:3000/api/user/signin", {
-				method: "POST",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					email: email.toLocaleLowerCase(),
-					password: password,
-				}),
-			});
+			const res = await fetch(
+				"https://cloudcloset.kolide.co.nz/api/user/signin",
+				{
+					method: "POST",
+					headers: {
+						Accept: "application/json",
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						email: email.toLocaleLowerCase(),
+						password: password,
+					}),
+				}
+			);
 			const json = await res.json();
 			if (json) {
 				// Assuming json.user contains user data
