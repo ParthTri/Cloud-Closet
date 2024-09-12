@@ -46,9 +46,17 @@ async function getUserItems(
 }
 
 export default function Closet() {
+	const [search, setSearch] = useState<string>("");
 	const { user } = useAuth();
 	const userID: string | undefined = user?.userID;
 	const [items, setItems] = useState<any[]>([{}]);
+
+	const searchForItem = async (search: string) => {
+		await getUserItems(userID, search).then((x) => {
+			setItems(x["data"]);
+		});
+	};
+
 	useEffect(() => {
 		getUserItems(userID).then((x) => setItems(x));
 	}, []);
