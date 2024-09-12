@@ -62,7 +62,7 @@ export default function Closet() {
 			<Suspense fallback={<Text>Loading...</Text>}>
 				<FlatList
 					data={items}
-					keyExtractor={(item) => item["id"]}
+					keyExtractor={(item) => item["imageID"]}
 					numColumns={2}
 					columnWrapperStyle={styles.row}
 					renderItem={({ item }) => (
