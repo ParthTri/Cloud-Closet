@@ -1,18 +1,13 @@
 import React from 'react';
 import { View, Button } from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-
-type RootStackParamList = {
-  Profile: undefined;
-  Welcome: undefined;
-  index: undefined;
-};
+import { useRouter } from 'expo-router';
 
 export default function Profile() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const router = useRouter();
 
   const goToHome = () => {
-    navigation.navigate('index');
+    
+    router.push('../auth/signin');
   };
 
   return (
