@@ -1,6 +1,10 @@
 import React from "react";
 import { View, Pressable, Text, Image, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import SettingLine from "@/components/SettingLine";
 
 export default function Profile() {
 	const router = useRouter();
@@ -23,20 +27,44 @@ export default function Profile() {
 			</View>
 
 			<View style={styles.card}>
-				<Text style={styles.cardItems}>Edit profile information</Text>
-				<Text style={styles.cardItems}>Notifications</Text>
-				<Text style={styles.cardItems}>Language</Text>
+				<SettingLine>
+					<AntDesign name="profile" size={24} color="black" />
+					<Text style={styles.cardItems}>Edit profile information</Text>
+				</SettingLine>
+				<SettingLine>
+					<AntDesign name="bells" size={24} color="black" />
+					<Text style={styles.cardItems}>Notifications</Text>
+				</SettingLine>
+				<SettingLine>
+					<MaterialIcons name="language" size={24} color="black" />
+					<Text style={styles.cardItems}>Language</Text>
+				</SettingLine>
 			</View>
 
 			<View style={styles.card}>
-				<Text style={styles.cardItems}>Security</Text>
-				<Text style={styles.cardItems}>Theme</Text>
+				<SettingLine>
+					<AntDesign name="lock" size={24} color="black" />
+					<Text style={styles.cardItems}>Security</Text>
+				</SettingLine>
+				<SettingLine>
+					<Ionicons name="moon-sharp" size={24} color="black" />
+					<Text style={styles.cardItems}>Theme</Text>
+				</SettingLine>
 			</View>
 
 			<View style={styles.card}>
-				<Text style={styles.cardItems}>Help & Support</Text>
-				<Text style={styles.cardItems}>Contact us</Text>
-				<Text style={styles.cardItems}>Privacy policy</Text>
+				<SettingLine>
+					<AntDesign name="contacts" size={24} color="black" />
+					<Text style={styles.cardItems}>Help & Support</Text>
+				</SettingLine>
+				<SettingLine>
+					<AntDesign name="message1" size={24} color="black" />
+					<Text style={styles.cardItems}>Contact us</Text>
+				</SettingLine>
+				<SettingLine>
+					<MaterialIcons name="shield" size={24} color="black" />
+					<Text style={styles.cardItems}>Privacy policy</Text>
+				</SettingLine>
 			</View>
 
 			<Pressable onPressIn={goToHome} style={styles.logout}>
@@ -104,7 +132,7 @@ const styles = StyleSheet.create({
 		elevation: 6,
 	},
 	cardItems: {
-		fontSize: 18,
+		fontSize: 20,
 		lineHeight: 26,
 	},
 });
