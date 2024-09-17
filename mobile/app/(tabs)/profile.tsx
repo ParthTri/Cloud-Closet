@@ -53,3 +53,58 @@ export default function Profile() {
 	);
 }
 
+const styles = StyleSheet.create({
+	logout: {
+		width: "90%",
+		backgroundColor: "#DA7575",
+		height: 80,
+		alignItems: "center",
+		justifyContent: "center",
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 3,
+		},
+		shadowOpacity: 0.27,
+		shadowRadius: 4.65,
+		elevation: 6,
+		borderRadius: 10,
+	},
+	container: {
+		display: "flex",
+		alignItems: "center",
+		backgroundColor: "#fff",
+		height: "100%",
+		justifyContent: "space-evenly",
+	},
+	profileImage: {
+		maxWidth: 250,
+		maxHeight: 250,
+	},
+	profileOverview: {
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		maxHeight: 300,
+		fontSize: 24,
+	},
+	card: {
+		borderRadius: 10,
+		width: "90%",
+		height: "auto",
+		padding: 10,
+		display: "flex",
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 3,
+		},
+		shadowOpacity: 0.27,
+		shadowRadius: 4.65,
+		elevation: 6,
+	},
+	cardItems: {
+		fontSize: 18,
+		lineHeight: 26,
+	},
+});
