@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Modal, Pressable, Image } from "react-native";
+import { View, Alert, StyleSheet, Modal, Pressable, Image } from "react-native";
 import ItemCategory from "./ItemCategory";
 import { Category } from "@/app/lib/category";
 import Feather from "@expo/vector-icons/Feather";
@@ -10,12 +10,29 @@ interface ModalProps {
 	setShow: (x: boolean) => void;
 	imageURL: string;
 	catergories: Category[] | undefined;
+	imageID: number;
+	removeItem: (id: string) => void;
 }
 
-async function deleteItem(itemID: string): Promise<boolean> {
-	console.log(`Deleted ${itemID}`);
+async function deleteUserItem(imageID: number) {
+	if (!imageID) return;
 
-	return false;
+	const response = await fetch(
+		`http://cloudcloset.kolide.co.nz/api/image/${imageID}`,
+		{
+			method: "DELETE",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+		}
+	);
+	if (response.ok) {
+		return true;
+	} else {
+		console.error("Delete error", response);
+		return false;
+	}
 }
 
 export default function ItemModal({
@@ -23,7 +40,9 @@ export default function ItemModal({
 	show,
 	setShow,
 	imageURL,
+	imageID,
 	catergories,
+	removeItem,
 }: ModalProps) {
 	return (
 		<Modal
@@ -47,7 +66,33 @@ export default function ItemModal({
 									<ItemCategory categoryID={val.categoryID} name={val.name} />
 							  ))}
 					</View>
-					<Pressable style={styles.bin} onPress={() => deleteItem(itemID)}>
+					<Pressable
+						style={styles.bin}
+						onPress={() => {
+							Alert.alert(
+								"Confirm Delete",
+								"Are you sure you want to delete this item?",
+								[
+									{
+										text: "Cancel",
+										onPress: () => console.log("cancel delete"),
+										style: "cancel",
+									},
+									{
+										text: "OK",
+										onPress: async () => {
+											const success = await deleteUserItem(imageID);
+											if (success) {
+												setShow(!show);
+												removeItem(imageID);
+											}
+										},
+									},
+								],
+								{ cancelable: false }
+							);
+						}}
+					>
 						<Feather name="trash-2" size={24} color="black" />
 					</Pressable>
 				</View>

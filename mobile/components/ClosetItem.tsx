@@ -12,9 +12,17 @@ interface ItemProps {
 	id: string;
 	url: string;
 	categories: Category[];
+	imageID: number;
+	removeItem: (id: string) => void;
 }
 
-export default function ClosetItem({ id, url, categories }: ItemProps) {
+export default function ClosetItem({
+	id,
+	url,
+	categories,
+	imageID,
+	removeItem,
+}: ItemProps) {
 	const [show, setShow] = useState(false);
 
 	return (
@@ -25,6 +33,8 @@ export default function ClosetItem({ id, url, categories }: ItemProps) {
 				setShow={setShow}
 				imageURL={url}
 				catergories={categories}
+				removeItem={removeItem}
+				imageID={imageID}
 			/>
 			<View>
 				<Image source={{ uri: url }} style={styles.image} />

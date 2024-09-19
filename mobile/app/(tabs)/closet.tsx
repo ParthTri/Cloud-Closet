@@ -45,24 +45,6 @@ async function getUserItems(
 	const json = await data.json();
 	return json;
 }
-async function deleteUserItem(imageID: string) {
-    if (!imageID) return;
-
-    const response = await fetch(`http://cloudcloset.kolide.co.nz/api/image/{imageID}`, {
-        method: "DELETE",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-        },
-    });
-	if (response.ok) {
-        
-        return true; 
-    } else {
-        console.error("delete error", response);
-        return false; 
-    }
-}
 export default function Closet() {
 	const [search, setSearch] = useState<string>("");
 	const { user } = useAuth();
@@ -108,46 +90,19 @@ export default function Closet() {
 					numColumns={2}
 					columnWrapperStyle={styles.row}
 					renderItem={({ item }) => (
-						<View style={{ position: 'relative' }}>
 						<ClosetItem
 							id={item["userID"]}
-							url={item["rawUrl"]}
-							categories={item["categories"]} />
-							 <Pressable
-                                onPress={() => {
-                                    Alert.alert(
-                                        "Confirm Delete",
-                                        "Are you sure you want to delete this cloth?",
-                                        [
-                                            {
-                                                text: "cancel",
-                                                onPress: () => console.log("cancel delete"),
-                                                style: "cancel"
-                                            },
-                                            {
-                                                text: "OK",
-                                                onPress: async () => {
-                                                    const success = await deleteUserItem(item["imageID"]);
-                                                    if (success) {
-                                                        setItems(currItems => currItems.filter(i => i.imageID !== item.imageID));
-                                                    }
-                                                }
-                                            }
-                                        ],
-                                        { cancelable: false }
-                                    );
-                                }}
-                                style={styles.deleteButton}>
-                                <Text style={styles.deleteButtonText}>Delete</Text>
-                            </Pressable>
-                        </View>
-                    )}
-                />
-            </Suspense>
-        </View>
-    );
+							url={item["processedUrl"]}
+							categories={item["categories"]}
+							imageID={item["imageID"]}
+							removeItem={removeItem}
+						/>
+					)}
+				/>
+			</Suspense>
+		</View>
+	);
 }
-
 
 const styles = StyleSheet.create({
 	itemContainer: {
@@ -171,16 +126,4 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		padding: 10,
 	},
-	deleteButton: {
-		backgroundColor: 'red',
-		padding: 10,
-		borderRadius: 5, 
-		alignItems: 'center', 
-		justifyContent: 'center', 
-		marginTop: 10, 
-	},
-	deleteButtonText: {
-		color: '#fff', 
-		fontSize: 16,
-	}
 });
