@@ -57,6 +57,10 @@ export default function Closet() {
 		});
 	};
 
+	const removeItem = (id: string) => {
+		setItems((currItems) => currItems.filter((i) => i.imageID !== id));
+	};
+
 	useEffect(() => {
 		getUserItems(userID, "").then((x) => setItems(x["data"]));
 	}, []);
