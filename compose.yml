@@ -1,21 +1,24 @@
-version: "3"
 services:
   nginx:
     image: nginx:latest
+    container_name: nginx
     ports:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     depends_on:
-      - nodeapp
+      - api
 
-  nodeapp:
-    image: node:20
-    working_dir: /var/www/app/backend/
-    volumes:
-      - .:/var/www/app/backend
-    command: npm start
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
     ports:
-      - "8081:8081"
+      - "3000:3000"
+    volumes:
+      - ./backend/node_modules:/home/node/app/node_modules/
+      - ./backend/dist:/home/node/app/dist
+      - ./.env:/home/node/app/.env:ro
     environment:
       - NODE_ENV=production
