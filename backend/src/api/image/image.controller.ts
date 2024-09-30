@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Delete, Param } from '@nestjs/common';
 import { ImageService } from './image.service';
 import { UserImageDTO } from './interface/userImage.dto';
 import { FileUploadDTO, FileUploadErrorDTO } from './interface/fileUpload.dto';
@@ -24,47 +24,46 @@ export class ImageController {
   }
 
   @Delete(':id')
-  async deleteImage(@Param('id') imageID: number): Promise<string> {
-    await this.imageService.deleteUserImage(imageID);
-    return 'Deleted';
+  async deleteImage(@Param('id') imageID: string): Promise<any> {
+    return await this.imageService.deleteUserImage(imageID);
   }
 
-  @Get(':userId')
-  async getImagesByUserId(@Param('userId') userId: string): Promise<any> {
-    return { data: await this.imageService.getImagesByUserId(userId) };
+  @Get()
+  async getImagesByUserId(@Body() payload: UserImageDTO): Promise<any> {
+    return await this.imageService.getImagesByUserId(payload);
   }
 
-  @Get('/search/:userId/:keyword')
-  async searchImageByKeyWord(
-    @Param('userId') userId,
-    @Param('keyword') keyword: string,
-  ): Promise<any> {
-    const data = await this.imageService.searchImageByKeyWord(keyword, userId);
+  //   @Get('/search/:userId/:keyword')
+  //   async searchImageByKeyWord(
+  //     @Param('userId') userId,
+  //     @Param('keyword') keyword: string,
+  //   ): Promise<any> {
+  //     const data = await this.imageService.searchImageByKeyWord(keyword, userId);
 
-    return {
-      statusCode: HttpStatus.OK,
-      data: data,
-    };
-  }
+  //     return {
+  //       statusCode: HttpStatus.OK,
+  //       data: data,
+  //     };
+  //   }
 
-  @Get('/filter/:userId/:categories')
-  async filterImageByCategory(
-    @Param('userId') userId,
-    @Param('categories') categories: string,
-  ): Promise<any> {
-    // Convert the comma-separated list of categories into an array of numbers
-    const categoriesArray = categories
-      .split(',')
-      .map((category) => Number(category));
+  //   @Get('/filter/:userId/:categories')
+  //   async filterImageByCategory(
+  //     @Param('userId') userId,
+  //     @Param('categories') categories: string,
+  //   ): Promise<any> {
+  //     // Convert the comma-separated list of categories into an array of numbers
+  //     const categoriesArray = categories
+  //       .split(',')
+  //       .map((category) => Number(category));
 
-    const data = await this.imageService.filterImageByCategory(
-      categoriesArray,
-      userId,
-    );
+  //     const data = await this.imageService.filterImageByCategory(
+  //       categoriesArray,
+  //       userId,
+  //     );
 
-    return {
-      statusCode: HttpStatus.OK,
-      data: data,
-    };
-  }
+  //     return {
+  //       statusCode: HttpStatus.OK,
+  //       data: data,
+  //     };
+  //   }
 }
