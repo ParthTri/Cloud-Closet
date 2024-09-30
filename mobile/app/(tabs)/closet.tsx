@@ -107,27 +107,39 @@ export default function Closet() {
 		</View>
 	);
 }
-
 const styles = StyleSheet.create({
 	itemContainer: {
 		flexDirection: "row",
 		flexWrap: "wrap",
 		width: "100%",
 		flex: 1,
+		padding: 100,
+		marginTop: 100, // Added top margin to move down the entire container
 	},
 	row: {
 		flexDirection: "row",
 		justifyContent: "space-between",
+		marginVertical: 10,
 	},
 	searchBar: {
 		width: "80%",
-		height: 64,
-		backgroundColor: "#F1F1F1",
-		borderRadius: 15,
+		height: 60,
+		backgroundColor: "#EDEDED",
+		borderRadius: 30,
 		color: "#000",
-		fontSize: 24,
+		fontSize: 20,
+		padding: 10,
+		paddingLeft: 20,
+		elevation: 5,
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
 		alignItems: "center",
 		justifyContent: "center",
-		padding: 10,
+		marginTop: 20, // Optional: Additional margin to further separate from the top
 	},
 });

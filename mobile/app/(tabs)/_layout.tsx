@@ -6,13 +6,33 @@ import { Tabs } from "expo-router";
 
 export default function TabLayout() {
 	return (
-		<Tabs screenOptions={{ tabBarActiveTintColor: "blue" }}>
+		<Tabs
+			screenOptions={{
+				tabBarActiveTintColor: "#8ABAE3",
+				tabBarInactiveTintColor: "gray",
+				tabBarStyle: {
+					backgroundColor: "white",
+					borderTopWidth: 0,
+					height: 65,
+					paddingBottom: 10,
+					elevation: 10,
+					shadowColor: "#000",
+					shadowOffset: { width: 0, height: 3 },
+					shadowOpacity: 0.1,
+					shadowRadius: 4,
+				},
+				tabBarLabelStyle: {
+					fontSize: 12,
+					paddingBottom: 5,
+				},
+			}}
+		>
 			<Tabs.Screen
 				name="index"
 				options={{
-					title: "",
+					title: "Home",
 					tabBarIcon: ({ color }) => (
-						<FontAwesome size={32} name="home" color={color} />
+						<FontAwesome size={28} name="home" color={color} />
 					),
 					headerShown: false,
 				}}
@@ -20,11 +40,11 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="closet"
 				options={{
-					title: "",
+					title: "Closet",
 					tabBarIcon: ({ color }) => (
 						<MaterialCommunityIcons
 							name="wardrobe-outline"
-							size={32}
+							size={28}
 							color={color}
 						/>
 					),
@@ -34,19 +54,19 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="upload"
 				options={{
-					title: "",
+					title: "Upload",
 					tabBarIcon: ({ color }) => (
-						<SimpleLineIcons name="cloud-upload" size={32} color={color} />
+						<SimpleLineIcons name="cloud-upload" size={28} color={color} />
 					),
 					headerShown: false,
 				}}
 			/>
 			<Tabs.Screen
-				name="calendar"
+				name="outfits"
 				options={{
-					title: "",
+					title: "Outfits",
 					tabBarIcon: ({ color }) => (
-						<Ionicons name="calendar-outline" size={32} color={color} />
+						<Ionicons name="shirt" size={28} color={color} />
 					),
 					headerShown: false,
 				}}
@@ -54,9 +74,9 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="profile"
 				options={{
-					title: "",
+					title: "Profile",
 					tabBarIcon: ({ color }) => (
-						<Ionicons name="person-circle-outline" size={32} color={color} />
+						<Ionicons name="person-circle-outline" size={28} color={color} />
 					),
 					headerShown: false,
 				}}
