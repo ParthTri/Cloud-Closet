@@ -1,52 +1,26 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Post,
-  Body,
-  Delete,
-  UseInterceptors,
-  UploadedFile,
-  HttpStatus,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ImageService } from './image.service';
-import { FileInterceptor } from '@nestjs/platform-express/multer';
-import { UploadImage } from './interface/uploadImage.dto';
-import { Image } from './image.entity';
+import { UserImageDTO } from './interface/userImage.dto';
+import { FileUploadDTO, FileUploadErrorDTO } from './interface/fileUpload.dto';
 
 @Controller('api/image')
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 
   @Post()
-  //@UseInterceptors(FileInterceptor('image'))
   async uploadImage(
-    //@UploadedFile() file: Express.Multer.File,
-    //@Body() body: UploadImage,
     @Body('fileName') fileName: string,
-    @Body('categories') categories: string,
-    @Body('userID') userID: string,
+    @Body('categories') categories: string[],
+    @Body('userId') userID: string,
     @Body('image') image: string,
-  ): Promise<any> {
-    console.log(fileName);
-    console.log(categories);
-    console.log(userID);
-
-    // Convert the comma-separated list of categories into an array of numbers
-    const categoriesArray = categories
-      .split(',')
-      .map((category) => Number(category));
-    for (const el of categoriesArray) {
-      console.log(el);
-    }
-
-    const imageID = await this.imageService.uploadUserImage(
+  ): Promise<FileUploadDTO | FileUploadErrorDTO> {
+    const res = await this.imageService.uploadUserImage(
       image,
       fileName,
-      categoriesArray,
+      categories,
       userID,
     );
-    return { imageID: imageID };
+    return res;
   }
 
   @Delete(':id')
