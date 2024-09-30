@@ -148,6 +148,37 @@ export class ImageService {
     return { ...rows };
   }
 
+  async deleteUserImage(imageId: string): Promise<any> {
+    const categoryDelete = await this.supa
+      .getClient()
+      .from('ImageCategory')
+      .delete()
+      .eq('imageId', imageId);
+
+    if (categoryDelete.status != 204) {
+      return {
+        error: categoryDelete,
+      };
+    }
+
+    const imageDelete = await this.supa
+      .getClient()
+      .from('Image')
+      .delete()
+      .eq('imageId', imageId);
+
+    if (imageDelete.status != 204) {
+      return {
+        error: imageDelete,
+      };
+    }
+
+    return {
+      data: 'Image deleted',
+      status: 200,
+    };
+  }
+
   //   async searchImageByKeyWord(keyword: string, userId): Promise<Array<Image>> {
   //     try {
   //       let searchResult = new Array<Image>();
