@@ -3,13 +3,14 @@ import { DatabaseHelper } from '../../database.helper';
 import { StorageHelper } from '../../storage.helper';
 import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Image } from './image.entity';
-import { User } from '../user/user.entity';
-import { Category } from '../category/category.entity';
+// import { TypeOrmModule } from '@nestjs/typeorm';
+import { SupabaseModule } from 'src/supabase/supabase.module';
+// import { Image } from './image.entity';
+// import { User } from '../user/user.entity';
+// import { Category } from '../category/category.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Image, User, Category])],
+  imports: [SupabaseModule],
   controllers: [ImageController],
   providers: [DatabaseHelper, StorageHelper, ImageService],
 })
