@@ -6,7 +6,7 @@ export interface GetWeatherDTO {
 
 export interface WeatherDTO {
   weather: string;
-  temperature: string;
+  temperature: number;
   location: string;
   error?: any;
 }
