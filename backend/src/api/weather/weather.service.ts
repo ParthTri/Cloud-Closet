@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { SupabaseProvider } from 'src/supabase/supabase.service';
 import { GetWeatherDTO, WeatherDTO } from './interface/weather.dto';
 import axios from 'axios';
 const URL_BUILDER = (lat: number, long: number): string =>
@@ -7,7 +6,7 @@ const URL_BUILDER = (lat: number, long: number): string =>
 
 @Injectable()
 export class WeatherService {
-  constructor(private supa: SupabaseProvider) {}
+  constructor() {}
 
   async getWeatherData(locationData: GetWeatherDTO): Promise<any> {
     let data: WeatherDTO;
