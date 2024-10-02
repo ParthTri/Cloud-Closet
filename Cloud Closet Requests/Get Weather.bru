@@ -1,0 +1,19 @@
+meta {
+  name: Get Weather
+  type: http
+  seq: 13
+}
+
+get {
+  url: http://localhost:3000/api/weather
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "longitude": 174.7635,
+    "latitude": -36.8485,
+    "timezone": "Pacific/Auckland"
+  }
+}
