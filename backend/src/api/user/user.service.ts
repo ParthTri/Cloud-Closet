@@ -1,52 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { CreateUserDTO } from './interfaces/create-user.dto';
-import * as bcrypt from 'bcrypt';
-import { User } from './user.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { UserSignIn } from './interfaces/userSigin.dto';
-
-const SALT_ROUNDS: number = 4;
+import { SupabaseProvider } from 'src/supabase/supabase.service';
+import { AuthTokenResponsePassword } from '@supabase/supabase-js';
 
 @Injectable()
 export class UserService {
   constructor(
-    // private readonly databaseHelper: DatabaseHelper,
-
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @Inject(SupabaseProvider)
+    private supa: SupabaseProvider,
   ) {}
 
   getHello(): any {
     return { msg: 'Hi Everyone!!!' };
   }
 
-  getAll(): Promise<User[]> {
-    return this.userRepository.find();
-  }
-
-  async getUser(id: string): Promise<User> {
-    return this.userRepository.findOneBy({ userID: id });
-  }
-
   async createUser(user: CreateUserDTO): Promise<string | any> {
     try {
-      // Check if email is in use. Otherwise return an error
-      const check = await this.userRepository.findBy({
+      const { data, error } = await this.supa.getClient().auth.signUp({
         email: user.Email,
+        password: user.Password,
       });
 
-      if (check.length > 0) {
-        return { error: 'User email already in use' };
+      if (error) {
+        return {
+          data: null,
+          error: error,
+        };
+      } else {
+        return {
+          data: {
+            id: data.user.id,
+            email: data.user.email,
+          },
+          error: null,
+        };
       }
-
-      const newUser: User = new User();
-      newUser.email = user.Email;
-      newUser.userName = user.Name;
-      newUser.userPassword = await bcrypt.hashSync(user.Password, SALT_ROUNDS);
-
-      const result: User = await this.userRepository.save(newUser);
-      return { userID: result.userID };
     } catch (e) {
       console.log(e.message);
       throw e;
@@ -55,20 +44,34 @@ export class UserService {
 
   async authenticateUser(user: UserSignIn): Promise<any> {
     try {
-      const foundUser = await this.userRepository.findOneByOrFail({
-        email: user.email,
-      });
+      const token: AuthTokenResponsePassword = await this.supa
+        .getClient()
+        .auth.signInWithPassword({
+          email: user.email,
+          password: user.password,
+        });
 
-      const result: boolean = bcrypt.compareSync(
-        user.password,
-        foundUser.userPassword,
-      );
+      console.log(token);
 
-      return {
-        "email": foundUser.email,
-        "userName": foundUser.userName,
-        "userID": foundUser.userID
-      };
+      if (!token.error) {
+        return {
+          data: {
+            id: token.data.user.id,
+            email: token.data.user.email,
+            access_token: token.data.session.access_token,
+          },
+          error: null,
+        };
+      } else {
+        return {
+          data: {
+            id: null,
+            email: null,
+            access_token: null,
+          },
+          error: token.error,
+        };
+      }
     } catch (e) {
       return false;
     }

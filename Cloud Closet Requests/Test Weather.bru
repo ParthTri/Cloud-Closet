@@ -1,0 +1,17 @@
+meta {
+  name: Test Weather
+  type: http
+  seq: 14
+}
+
+get {
+  url: https://api.open-meteo.com/v1/forecast?latitude=-36.8485&longitude=174.7635&hourly=temperature_2m,precipitation_probability,rain,weather_code
+  body: none
+  auth: none
+}
+
+params:query {
+  latitude: -36.8485
+  longitude: 174.7635
+  hourly: temperature_2m,precipitation_probability,rain,weather_code
+}

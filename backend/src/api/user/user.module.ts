@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user.entity';
+import { SupabaseModule } from '../../supabase/supabase.module';
+// import { User } from './user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [SupabaseModule],
   controllers: [UserController],
   providers: [UserService],
 })
