@@ -1,12 +1,21 @@
-import { View, Text, Pressable, StyleSheet, Image, ScrollView } from "react-native";
+import { View, Text, Pressable, StyleSheet, Image, ScrollView, Modal } from "react-native";
 import { useAuth } from "../authContext";
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { Logo } from "@/components/Logo";
-
+import React, { useState } from 'react';
 
 export default function HomePage() {
 	const { user, logout } = useAuth(); // Get user data from AuthContext
-	
+	const [modalVisible, setModalVisible] = useState(false);
+	const [buttonPressed, setButtonPressed] = useState(false);
+	// const fetchWeatherData = async () => { ... }
+
+	// test - need to replace??? with actual notifs
+	const notifications = [
+		{ id: 1, message: 'New outfit suggestion available!' },
+		{ id: 2, message: 'Your outfit has been saved successfully.' },
+		{ id: 3, message: 'Weather update: Chance of rain today.' },
+	];
 
 	return (
 		
@@ -14,9 +23,40 @@ export default function HomePage() {
 			<View style={styles.headerContainer}>
 				<Logo logoWidth={30} logoHeight={30} />
 				<Text style={styles.header}>CLOUD CLOSET</Text>
-				<Ionicons name="notifications-outline" size={30} color="black" />
+				<Pressable onPress={() => setModalVisible(true)}>
+					<Ionicons name="notifications-outline" size={30} color="black" />
+				</Pressable>
 			</View>
-			
+
+			{/* this is the notifications */}
+			<Modal
+				animationType="slide"
+				transparent={true}
+				visible={modalVisible}
+				onRequestClose={() => setModalVisible(false)}
+			>
+				<View style={styles.modalContainer}>
+					<View style={styles.modalContent}>
+						<Text style={styles.modalTitle}>Notifications</Text>
+						{notifications.length > 0 ? (
+							notifications.map((notification) => (
+								<Text key={notification.id} style={styles.notificationBox}>
+									{notification.message}
+								</Text>
+							))
+						) : (
+							<Text style={styles.noNotificationsText}>No new notifications</Text>
+						)}
+						<Pressable
+							style={styles.closeButton}
+							onPress={() => setModalVisible(false)}
+						>
+							<Text style={styles.closeButtonText}>Close</Text>
+						</Pressable>
+					</View>
+				</View>
+			</Modal>
+
 			<View style={styles.weatherContainer}>
 				<View style={styles.weatherInfo}>
 					<FontAwesome name1="cloud-rain" size={24} color="black" />
@@ -29,13 +69,20 @@ export default function HomePage() {
 				</View>
 			</View>
 
-			{/* Generate Outfit Button - change to click change color */}
-			<Pressable style={styles.generateButton}>
+			{/* Generate Outfit Button */}
+			<Pressable
+				style={[
+					styles.generateButton,
+					{ backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" } // Change color based on state
+				]}
+				onPressIn={() => setButtonPressed(true)} // When button is pressed
+				onPressOut={() => setButtonPressed(false)} // When button is released
+			>
 				<Text style={styles.generateButtonText}>GENERATE OUTFIT</Text>
 			</Pressable>
 
 			<Text style={styles.sectionHeader}>Saved Outfits</Text>
-			
+
 			<ScrollView>
 				<View style={styles.outfitGrid}>
 					{[...Array(6)].map((_, index) => (
@@ -68,6 +115,56 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		fontSize: 24,
+		fontWeight: "bold",
+	},
+	modalContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "rgba(0, 0, 0, 0.5)",
+	},
+	modalContent: {
+		width: "80%",
+		backgroundColor: "#FFF",
+		borderRadius: 10,
+		padding: 20,
+		alignItems: "center",
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.8,
+		shadowRadius: 2,
+		elevation: 5,
+	},
+	modalTitle: {
+		fontSize: 22,
+		fontWeight: "bold",
+		marginBottom: 15,
+	},
+	notificationBox: {
+		backgroundColor: "#F9F9F9",
+		borderRadius: 8,
+		padding: 15,
+		marginVertical: 5,
+		width: "100%",
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
+		elevation: 2,
+	},
+	noNotificationsText: {
+		fontSize: 16,
+		color: "gray",
+	},
+	closeButton: {
+		marginTop: 20,
+		backgroundColor: "#8ABAE3",
+		paddingVertical: 10,
+		paddingHorizontal: 20,
+		borderRadius: 5,
+	},
+	closeButtonText: {
+		color: "#FFF",
 		fontWeight: "bold",
 	},
 	weatherContainer: {
