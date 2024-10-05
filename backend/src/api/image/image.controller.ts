@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Delete, Param } from '@nestjs/common';
 import { ImageService } from './image.service';
 import { UserImageDTO } from './interface/userImage.dto';
 import { FileUploadDTO, FileUploadErrorDTO } from './interface/fileUpload.dto';
+import { console } from 'inspector';
 
 @Controller('api/image')
 export class ImageController {
@@ -31,6 +32,13 @@ export class ImageController {
   @Get()
   async getImagesByUserId(@Body() payload: UserImageDTO): Promise<any> {
     return await this.imageService.getImagesByUserId(payload);
+  }
+
+  @Get('/imageId/:imageId')
+  async getImagesByImageId(@Param('imageId') imageId: string): Promise<{data, error}> {
+    console.log("Into this API");
+    console.log(imageId);
+    return await this.imageService.getImageInfoByImageId(imageId);
   }
 
   //   @Get('/search/:userId/:keyword')
