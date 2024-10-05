@@ -4,6 +4,7 @@ import { UserImageDTO } from './interface/userImage.dto';
 import { v1 as uuidv1 } from 'uuid';
 import { removeBackground } from '@imgly/background-removal-node';
 import { FileUploadDTO, FileUploadErrorDTO } from './interface/fileUpload.dto';
+import { error } from 'console';
 
 @Injectable()
 export class ImageService {
@@ -146,6 +147,18 @@ export class ImageService {
       return { data: null, error: rows.error };
     }
     return { ...rows };
+  }
+
+  async getImageInfoByImageId(imageId: string): Promise<{data, error}> {
+    const row = await this.supa
+      .getClient()
+      .from('Image')
+      .select('*')
+      .eq('imageId', imageId);
+    if (row.error) {
+      return { data: null, error: row.error };
+    }
+    return { data: row.data, error: row.error};
   }
 
   async deleteUserImage(imageId: string): Promise<any> {

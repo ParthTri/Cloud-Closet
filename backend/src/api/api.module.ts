@@ -4,9 +4,11 @@ import { UserModule } from './user/user.module';
 import { ImageModule } from './image/image.module';
 import { WeatherModule } from './weather/weather.module';
 import { CategoryModule } from './category/category.module';
+import { OutfitCategoryModule } from './outfit/outfitCategory/outfitCategory.module';
+import {OutfitModule} from './outfit/outfit.module';
 
 @Module({
-  imports: [UserModule, ImageModule, CategoryModule, WeatherModule],
+  imports: [UserModule, ImageModule, CategoryModule, WeatherModule, OutfitCategoryModule, OutfitModule],
   controllers: [ApiController],
   providers: [],
 })
