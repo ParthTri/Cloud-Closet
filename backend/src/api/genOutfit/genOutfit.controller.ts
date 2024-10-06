@@ -8,9 +8,6 @@ export class GenOutfitController {
 
   @Get()
   async generateOutfit(@Body() input: GenOutfitDTO) {
-    console.log(input);
-    this.genService.generateOutft(input);
-
-    return { data: 'hello World' };
+    return await this.genService.generateOutft(input);
   }
 }
