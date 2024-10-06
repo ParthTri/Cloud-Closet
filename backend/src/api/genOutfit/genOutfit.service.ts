@@ -1,6 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { WeatherService } from '../weather/weather.service';
-import { GenOutfitDTO, OutfitType } from './interface/genOutfit.dto';
+import {
+  GeneratedOutfitItem,
+  GenOutfitDTO,
+  OutfitItemCategory,
+  OutfitType,
+} from './interface/genOutfit.dto';
 import { SupabaseProvider } from 'src/supabase/supabase.service';
 
 @Injectable()
@@ -11,17 +16,35 @@ export class GenOutfitService {
     private supa: SupabaseProvider,
   ) {}
 
-  async generateOutft(req: GenOutfitDTO) {
-    // const weatherInfo = await this.weatherService.getWeatherData({
-    //   latitude: req.latitude,
-    //   longitude: req.longitude,
-    // });
+  formatOutfitData(data: any[]): GeneratedOutfitItem[] {
+    const outfitData: GeneratedOutfitItem[] = [];
 
-    const weatherInfo = {
-      data: {
-        temperature: 18,
-      },
-    };
+    data.forEach((val) => {
+      const itemData: GeneratedOutfitItem = {
+        imaegId: val['imageId'],
+        processedUrl: val['processedUrl'],
+        imageCategory: [],
+      };
+
+      val['ImageCategory'].forEach((imageCat) => {
+        const itemCat: OutfitItemCategory = {
+          categoryId: imageCat['categoryId'],
+          categoryName: imageCat['ItemCategory']['name'],
+        };
+        itemData.imageCategory.push(itemCat);
+      });
+
+      outfitData.push(itemData);
+    });
+
+    return outfitData;
+  }
+
+  async generateOutft(req: GenOutfitDTO) {
+    const weatherInfo = await this.weatherService.getWeatherData({
+      latitude: req.latitude,
+      longitude: req.longitude,
+    });
 
     // Set the search tag
     const searchTag = weatherInfo.data.temperature <= 16 ? 'cool' : 'warm';
@@ -58,7 +81,6 @@ export class GenOutfitService {
     data.forEach((val) => {
       val.ImageCategory.forEach((imageCat) => {
         if (imageCat.ItemCategory['name'] == searchTag) {
-          // console.log(imageCat);
           outfit.push(val);
         }
       });
@@ -100,6 +122,6 @@ export class GenOutfitService {
       }
     });
 
-    return payload;
+    return this.formatOutfitData(payload);
   }
 }
