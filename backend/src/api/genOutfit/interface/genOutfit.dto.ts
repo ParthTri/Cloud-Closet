@@ -9,3 +9,14 @@ export enum OutfitType {
   FORMAL,
   CASUAL,
 }
+
+export interface GeneratedOutfitItem {
+  imaegId: string;
+  processedUrl: string;
+  imageCategory: OutfitItemCategory[];
+}
+
+export interface OutfitItemCategory {
+  categoryId: number;
+  categoryName: string;
+}
