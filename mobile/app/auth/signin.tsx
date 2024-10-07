@@ -12,6 +12,7 @@ async function save(key: string, value: string) {
 	await SecureStore.setItemAsync(key, value);
 }
 
+
 export default function SignIn() {
 	const { login } = useAuth(); // Get login function from AuthContext
 
@@ -55,6 +56,11 @@ export default function SignIn() {
 			setShowError(true);
 			console.log(error);
 		}
+	};
+
+	const continueWithoutLogin = () => {
+		// Skip login and navigate directly to next screen
+		router.push("../(tabs)");
 	};
 
 	return (
@@ -142,6 +148,18 @@ export default function SignIn() {
 					Sign In
 				</Text>
 			</Pressable>
+
+			{/* Continue Without Login Button */}
+			<Pressable
+				onPress={() => continueWithoutLogin()}
+				style={[
+					styles.button,
+					{ backgroundColor: "#8ABAE3", marginTop: 10 },
+				]}
+			>
+				<Text style={{ color: "#fff" }}>Continue Without Login</Text>
+			</Pressable>
+			
 		</View>
 	);
 }

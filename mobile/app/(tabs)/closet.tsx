@@ -10,6 +10,7 @@ import {
 	Alert,
 } from "react-native";
 import { useAuth } from "../authContext";
+import { Logo } from "@/components/Logo";
 import Feather from "@expo/vector-icons/Feather";
 
 async function getUserItems(
@@ -66,27 +67,24 @@ export default function Closet() {
 	}, []);
 
 	return (
-		<View
-			style={{
-				backgroundColor: "#fff",
-			}}
-		>
-			{/* Search bar */}
-			<View
-				style={{
-					flexDirection: "row",
-					justifyContent: "center",
-					alignItems: "center",
-				}}
-			>
+		<View style={styles.container}>
+			<View style={styles.headerContainer}>
+				<Logo logoWidth={30} logoHeight={30} />
+				<Text style={styles.header}>CLOUD CLOSET</Text>
+			</View>
+
+			<View style={styles.searchContainer}>
 				<TextInput
 					style={styles.searchBar}
-					onChangeText={(text) => setSearch(text)}
-				></TextInput>
+					onChangeText={setSearch}
+					value={search}
+					placeholder="Search items..."
+				/>
 				<Pressable onPress={() => searchForItem(search)}>
 					<Feather name="search" size={31} color="black" />
 				</Pressable>
 			</View>
+
 			<Suspense fallback={<Text>Loading...</Text>}>
 				<FlatList
 					data={items}
@@ -107,27 +105,50 @@ export default function Closet() {
 		</View>
 	);
 }
-
 const styles = StyleSheet.create({
-	itemContainer: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		width: "100%",
+	container: {
 		flex: 1,
+		padding: 20,
+		backgroundColor: "#FFFFFF",
+		paddingTop: 55,
+	},
+	header: {
+		fontSize: 24,
+		fontWeight: "bold",
+		alignContent: "center",
+		paddingLeft: 30,
+	},
+	headerContainer: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 20,
+	},
+	searchContainer: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 20,
 	},
 	row: {
 		flexDirection: "row",
 		justifyContent: "space-between",
+		marginVertical: 10,
 	},
 	searchBar: {
-		width: "80%",
-		height: 64,
-		backgroundColor: "#F1F1F1",
-		borderRadius: 15,
+		flex: 1,
+		height: 50,
+		backgroundColor: "#EDEDED",
+		borderRadius: 30,
 		color: "#000",
-		fontSize: 24,
-		alignItems: "center",
-		justifyContent: "center",
-		padding: 10,
+		fontSize: 20,
+		paddingLeft: 20,
+		marginRight: 10,
+		elevation: 5,
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
 	},
 });
