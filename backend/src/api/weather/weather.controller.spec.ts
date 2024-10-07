@@ -1,4 +1,6 @@
 import { Test } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
+
 import { WeatherController } from './weather.controlller';
 import { WeatherService } from './weather.service';
 import { GetWeatherDTO } from './interface/weather.dto';
@@ -11,6 +13,7 @@ describe('WeatherController', () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [WeatherController],
       providers: [WeatherService],
+      imports: [ConfigModule.forRoot()],
     }).compile();
 
     weatherService = moduleRef.get(WeatherService);
@@ -25,16 +28,7 @@ describe('WeatherController', () => {
         timezone: 'Pacific/Auckland',
       };
 
-      const output: any = {
-        data: {
-          location: 'Auckland',
-        },
-        error: null,
-      };
-
-      const spy = jest
-        .spyOn(weatherService, 'getWeatherData')
-        .mockResolvedValue(output);
+      const spy = jest.spyOn(weatherService, 'getWeatherData');
 
       const result = await weatherController.getLocalWeather(input);
 
@@ -44,14 +38,7 @@ describe('WeatherController', () => {
       expect(spy).toHaveBeenCalledTimes(1);
 
       // Expect the result of the mock test to contain the correct location
-      expect(result).toEqual(
-        expect.objectContaining({
-          data: {
-            location: 'Auckland',
-          },
-          error: null,
-        }),
-      );
+      expect(result.data.location).toEqual('Auckland');
     });
   });
 });

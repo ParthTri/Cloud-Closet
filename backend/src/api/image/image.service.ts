@@ -1,23 +1,33 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { SupabaseProvider } from 'src/supabase/supabase.service';
-import { UserImageDTO } from './interface/userImage.dto';
 import { v1 as uuidv1 } from 'uuid';
 import { removeBackground } from '@imgly/background-removal-node';
 import { FileUploadDTO, FileUploadErrorDTO } from './interface/fileUpload.dto';
+import { ImageDTO } from './interface/image.dto';
+import { CategoryService } from '../category/category.service';
+import { OutfitService } from '../outfit/outfit.service';
 
 @Injectable()
 export class ImageService {
   constructor(
     @Inject(SupabaseProvider)
     private supa: SupabaseProvider,
+    private readonly categoryService: CategoryService,
+    @Inject(forwardRef(() => OutfitService)) // Use forwardRef here
+    private readonly outfitService: OutfitService,
   ) {}
 
   async uploadUserImage(
     image: string,
     fileName: string,
-    categories: string[],
-    userID: string,
+    categories: string,
+    userId: string,
   ): Promise<FileUploadDTO | FileUploadErrorDTO> {
+    console.log(image);
+    console.log(fileName);
+    console.log(categories);
+    console.log(userId);
+    
     const responseData: FileUploadDTO = {
       rawData: {
         id: '',
@@ -97,7 +107,7 @@ export class ImageService {
       .insert({
         rawUrl: responseData.rawUrl,
         processedUrl: responseData.processedUrl,
-        userId: userID,
+        userId: userId,
       })
       .select();
 
@@ -110,45 +120,118 @@ export class ImageService {
     responseData.imageId = insertData[0].imageId;
 
     // Insert Category data in to ImageCategory
-    categories.forEach(async (name) => {
-      // Get the category id from the name
-      const { data, error } = await client
-        .from('ItemCategory')
-        .select('id')
-        .eq('name', name.toLowerCase());
+    // categories.forEach(async (name) => {
+    //   // Get the category id from the name
+    //   const { data, error } = await client
+    //     .from('ItemCategory')
+    //     .select('id')
+    //     .eq('name', name.toLowerCase());
 
-      if (error) {
-        return;
-      }
+    //   if (error) {
+    //     return;
+    //   }
 
+    //   const { error: categoryError } = await client
+    //     .from('ImageCategory')
+    //     .insert({
+    //       imageId: insertData[0].imageId,
+    //       categoryId: data[0].id,
+    //     });
+
+    //   if (categoryError) {
+    //     return;
+    //   }
+    // });
+
+    // Insert Category data in to ImageCategory
+     // Convert the comma-separated list of categories into an array of numbers
+     const categoriesArray = categories.split(',').map((category) => Number(category));
+    // Insert to ImageCategory database
+     for(const element of categoriesArray)
+     {
       const { error: categoryError } = await client
         .from('ImageCategory')
         .insert({
           imageId: insertData[0].imageId,
-          categoryId: data[0].id,
+          categoryId: element,
         });
 
       if (categoryError) {
         return;
       }
-    });
+
+     }
+
 
     return responseData;
   }
 
-  async getImagesByUserId(userImage: UserImageDTO): Promise<any> {
+  async getImagesByUserId(userId: string): Promise<{data, error}> {
     const rows = await this.supa
       .getClient()
       .from('Image')
       .select('*')
-      .eq('userId', userImage.userId);
+      .eq('userId', userId);
     if (rows.error) {
       return { data: null, error: rows.error };
     }
-    return { ...rows };
+
+    let images = Array <ImageDTO>();
+
+    for (const image of rows.data)
+    {
+      const categories = (await this.categoryService.getImageCategoriesByImageId(image.imageId)).data;
+      images.push({
+        imageId: image.imageId,
+        created_at: image.created_at,
+        rawUrl: image.rawUrl,
+        processedUrl: image.processedUrl,
+        userId: image.userId,
+        categories: categories
+      });
+    }
+    return { data: images, error: rows.error };
+  }
+
+  async getImageInfoByImageId(imageId: string): Promise<{data, error}> {
+
+    const row = await this.supa
+      .getClient()
+      .from('Image')
+      .select('*')
+      .eq('imageId', imageId);
+    if (row.error) {
+      return { data: null, error: row.error };
+    }
+
+    //Get image categories
+    const imageCategories = (await this.categoryService.getImageCategoriesByImageId(imageId)).data;
+    
+    const image: ImageDTO = {
+      imageId: row.data[0].imageId,
+      created_at: row.data[0].created_at,
+      rawUrl: row.data[0].rawUrl,
+      processedUrl: row.data[0].processedUrl,
+      userId: row.data[0].userId,
+      categories: imageCategories
+    };
+
+    return { data: image, error: row.error};
   }
 
   async deleteUserImage(imageId: string): Promise<any> {
+    // Delete outfit which contains imageId
+    // Find outfit contains imageId
+    const outfitRows = (await this.outfitService.getAllOutfitIdsbyImageId(imageId)).data;
+    if (outfitRows)
+    {
+      for (const outfitId of outfitRows)
+      {
+        await this.outfitService.deleteOutfit(outfitId);
+      }
+    }
+    
+    //Delete categoryImage
     const categoryDelete = await this.supa
       .getClient()
       .from('ImageCategory')
@@ -160,6 +243,8 @@ export class ImageService {
         error: categoryDelete,
       };
     }
+
+    // Delete in Image table
 
     const imageDelete = await this.supa
       .getClient()
@@ -179,31 +264,34 @@ export class ImageService {
     };
   }
 
-  //   async searchImageByKeyWord(keyword: string, userId): Promise<Array<Image>> {
-  //     try {
-  //       let searchResult = new Array<Image>();
+    async searchImageByKeyWord(keyword: string, userId): Promise<{data, error}> {
+        let searchResult = new Array<ImageDTO>();
 
-  //       const allUserimages = await this.getImagesByUserId(userId);
+        let queryImagesResult = await this.getImagesByUserId(userId);
 
-  //       for (const image of allUserimages) {
-  //         // Check if any category name matches the keyword
-  //         let hasKeyword = false;
-  //         for (const cat of image.categories) {
-  //           if (cat.name.toLocaleLowerCase().includes(keyword.toLowerCase())) {
-  //             hasKeyword = true;
-  //             break;
-  //           }
-  //         }
-  //         if (hasKeyword) {
-  //           searchResult.push(image);
-  //         }
-  //       }
-  //       return searchResult;
-  //     } catch (error) {
-  //       console.error('Error finding images by keyword:', error);
-  //       throw new Error('Error finding images by keyword');
-  //     }
-  //   }
+        if (!queryImagesResult.data)
+        {
+          return {data: null, error: queryImagesResult.error };
+        }  
+
+        const allUserimages = queryImagesResult.data;
+
+        for (const image of allUserimages) {
+          // Check if any category name matches the keyword
+          let hasKeyword = false;
+          for (const cat of image.categories) {
+            if (cat.name.toLocaleLowerCase().includes(keyword.toLowerCase())) {
+              hasKeyword = true;
+              break;
+            }
+          }
+          if (hasKeyword) {
+            searchResult.push(image);
+          }
+        }
+        return {data: searchResult, error: null};
+      
+    }
 
   //   async filterImageByCategory(
   //     categories: Array<number>,
@@ -235,3 +323,5 @@ export class ImageService {
   //     return filterResult;
   //   }
 }
+
+
