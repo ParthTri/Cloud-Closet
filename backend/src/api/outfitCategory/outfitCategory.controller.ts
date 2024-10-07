@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Post, Delete, Param } from '@nestjs/common';
 import { OutfitCategoryService } from './outfitCategory.service';
-import { OutfitCategory } from './interfaces/outfitCategory.dto';
 
 @Controller('api/outfitCategory')
 export class OutfitCategoryController {

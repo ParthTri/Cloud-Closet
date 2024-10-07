@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Post, Delete, Param } from '@nestjs/common';
 import { ImageService } from './image.service';
-import { UserImageDTO } from './interface/userImage.dto';
 import { FileUploadDTO, FileUploadErrorDTO } from './interface/fileUpload.dto';
 import { console } from 'inspector';
 
@@ -29,9 +28,9 @@ export class ImageController {
     return await this.imageService.deleteUserImage(imageID);
   }
 
-  @Get()
-  async getImagesByUserId(@Body() payload: UserImageDTO): Promise<any> {
-    return await this.imageService.getImagesByUserId(payload);
+  @Get(':userId')
+  async getImagesByUserId(@Param('userId') userId: string): Promise<{data, error}> {
+    return await this.imageService.getImagesByUserId(userId);
   }
 
   @Get('/imageId/:imageId')
@@ -41,18 +40,15 @@ export class ImageController {
     return await this.imageService.getImageInfoByImageId(imageId);
   }
 
-  //   @Get('/search/:userId/:keyword')
-  //   async searchImageByKeyWord(
-  //     @Param('userId') userId,
-  //     @Param('keyword') keyword: string,
-  //   ): Promise<any> {
-  //     const data = await this.imageService.searchImageByKeyWord(keyword, userId);
+    @Get('/search/:userId/:keyword')
+    async searchImageByKeyWord(
+      @Param('userId') userId,
+      @Param('keyword') keyword: string,
+    ): Promise<{data, error}> {
+      const {data, error} = await this.imageService.searchImageByKeyWord(keyword, userId);
 
-  //     return {
-  //       statusCode: HttpStatus.OK,
-  //       data: data,
-  //     };
-  //   }
+      return {data, error};
+    }
 
   //   @Get('/filter/:userId/:categories')
   //   async filterImageByCategory(

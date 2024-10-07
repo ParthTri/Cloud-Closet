@@ -63,7 +63,4 @@ console.log(row.data[0].name);
 
 return { data: row.data[0].name, error: row.error};    
 }
-
-
-
 }

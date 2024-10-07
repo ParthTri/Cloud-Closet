@@ -1,28 +1,21 @@
-import { Controller, Get, HttpStatus } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param} from '@nestjs/common';
 import { CategoryService } from './category.service';
-// import { CategoryDTO } from './interfaces/category.dto';
 
 @Controller('/api/categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get()
-  async getAllCategories(): Promise<any> {
-    const data = await this.categoryService.getAllCategories();
+  async getAllCategories(): Promise<{data, error}> {
+    const {data, error} = await this.categoryService.getAllCategories();
 
-    return {
-      statusCode: HttpStatus.OK,
-      data: data,
-    };
+    return {data, error };
   }
 
-  //   @Get('/:id')
-  //   async getCategoryById(@Param('id') id): Promise<any> {
-  //     const data = await this.categoryService.getCategoryById(id);
+    @Get('/:imageId')
+    async getImageCategoriesByImageId(@Param('imageId') imageId: string): Promise<{data, error}> {
+      const {data, error} = await this.categoryService.getImageCategoriesByImageId(imageId);
 
-  //     return {
-  //       statusCode: HttpStatus.OK,
-  //       data: data,
-  //     };
-  //   }
+      return {data, error};
+    }
 }

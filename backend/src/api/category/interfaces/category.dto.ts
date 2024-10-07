@@ -1,4 +1,4 @@
 export interface CategoryDTO {
-  categoryID?: bigint;
+  categoryId?: number;
   name: string;
 }
