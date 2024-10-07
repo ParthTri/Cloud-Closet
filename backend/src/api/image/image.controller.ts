@@ -10,15 +10,15 @@ export class ImageController {
   @Post()
   async uploadImage(
     @Body('fileName') fileName: string,
-    @Body('categories') categories: string[],
-    @Body('userId') userID: string,
+    @Body('categories') categories: string,
+    @Body('userId') userId: string,
     @Body('image') image: string,
   ): Promise<FileUploadDTO | FileUploadErrorDTO> {
     const res = await this.imageService.uploadUserImage(
       image,
       fileName,
       categories,
-      userID,
+      userId,
     );
     return res;
   }
