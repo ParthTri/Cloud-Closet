@@ -20,9 +20,14 @@ export class ImageService {
   async uploadUserImage(
     image: string,
     fileName: string,
-    categories: string[],
-    userID: string,
+    categories: string,
+    userId: string,
   ): Promise<FileUploadDTO | FileUploadErrorDTO> {
+    console.log(image);
+    console.log(fileName);
+    console.log(categories);
+    console.log(userId);
+    
     const responseData: FileUploadDTO = {
       rawData: {
         id: '',
@@ -102,7 +107,7 @@ export class ImageService {
       .insert({
         rawUrl: responseData.rawUrl,
         processedUrl: responseData.processedUrl,
-        userId: userID,
+        userId: userId,
       })
       .select();
 
@@ -115,28 +120,48 @@ export class ImageService {
     responseData.imageId = insertData[0].imageId;
 
     // Insert Category data in to ImageCategory
-    categories.forEach(async (name) => {
-      // Get the category id from the name
-      const { data, error } = await client
-        .from('ItemCategory')
-        .select('id')
-        .eq('name', name.toLowerCase());
+    // categories.forEach(async (name) => {
+    //   // Get the category id from the name
+    //   const { data, error } = await client
+    //     .from('ItemCategory')
+    //     .select('id')
+    //     .eq('name', name.toLowerCase());
 
-      if (error) {
-        return;
-      }
+    //   if (error) {
+    //     return;
+    //   }
 
+    //   const { error: categoryError } = await client
+    //     .from('ImageCategory')
+    //     .insert({
+    //       imageId: insertData[0].imageId,
+    //       categoryId: data[0].id,
+    //     });
+
+    //   if (categoryError) {
+    //     return;
+    //   }
+    // });
+
+    // Insert Category data in to ImageCategory
+     // Convert the comma-separated list of categories into an array of numbers
+     const categoriesArray = categories.split(',').map((category) => Number(category));
+    // Insert to ImageCategory database
+     for(const element of categoriesArray)
+     {
       const { error: categoryError } = await client
         .from('ImageCategory')
         .insert({
           imageId: insertData[0].imageId,
-          categoryId: data[0].id,
+          categoryId: element,
         });
 
       if (categoryError) {
         return;
       }
-    });
+
+     }
+
 
     return responseData;
   }
