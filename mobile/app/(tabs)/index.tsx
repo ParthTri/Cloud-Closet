@@ -14,7 +14,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 //import { WeatherController } from './weather.controller';
 
-
 export default function HomePage() {
   const { user, logout } = useAuth(); // Get user data from AuthContext
   const [modalVisible, setModalVisible] = useState(false);
@@ -31,14 +30,14 @@ export default function HomePage() {
   const fetchWeatherData = async () => {
     try {
       const response = await axios.get(API_Weather, {
-        params: {
+        data: {
           latitude: -36.848461,
           longitude: 174.763336,
-        },
+        }
       });
 
       const { data, error } = response.data;
-
+      
       if (error) {
         throw new Error(error);
       }
@@ -176,7 +175,6 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     fontWeight: "bold",
-    alignContent: "center",
   },
   modalContainer: {
     flex: 1,
