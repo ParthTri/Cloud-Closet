@@ -27,6 +27,7 @@ export default function HomePage() {
     location: "",
   });
 
+  
   const fetchWeatherData = async () => {
     try {
       const response = await axios.get(API_Weather, {
