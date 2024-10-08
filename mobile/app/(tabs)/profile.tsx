@@ -23,6 +23,7 @@ export default function Profile() {
 	};
 
 	return (
+		
 		<View style={styles.container}>
 			{/* Overview */}
 			<View style={styles.profileOverview}>
@@ -91,6 +92,34 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
+	header: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		paddingHorizontal: 16,
+		width: '100%',
+	},
+	headerAction: {
+		width: 40,
+		height: 40,
+		alignItems: "flex-start",
+		justifyContent: "center",
+	},
+	headerTitle: {
+		fontSize: 19,
+		fontWeight: '600',
+		color: '#000',
+		flexGrow: 1,
+		flexShrink: 1,
+		flexBasis: 0,
+		textAlign: 'center',
+	},
+
+
+
+
+
+
 	logout: {
 		width: "90%",
 		backgroundColor: "#DA7575",
