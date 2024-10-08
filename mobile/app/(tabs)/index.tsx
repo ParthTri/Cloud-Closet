@@ -4,6 +4,7 @@ import {
   Pressable,
   StyleSheet,
   Image,
+  Button,
   ScrollView,
   Modal,
 } from "react-native";
@@ -18,7 +19,9 @@ import axios from "axios";
 export default function HomePage() {
   const { user, logout } = useAuth(); // Get user data from AuthContext
   const [modalVisible, setModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
+  const [isCategorySelectionVisible, setIsCategorySelectionVisible] = useState(false);
   
   const API_Weather = "https://cloudcloset.kolide.co.nz/api/weather";
 
@@ -62,7 +65,7 @@ export default function HomePage() {
     fetchWeatherData(); // Fetch weather data when the component mounts
   }, []);
 
-
+  
  
   // test - need to replace??? with actual notifs
   const notifications = [
@@ -135,11 +138,27 @@ export default function HomePage() {
           styles.generateButton,
           { backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" }, // Change color based on state
         ]}
-        onPressIn={() => setButtonPressed(true)} // When button is pressed
+        onPressIn={() => setButtonPressed(true)} // When button is pressed - show modal 
+        onPress={() => setIsModalVisible(true)} // - show modal 
         onPressOut={() => setButtonPressed(false)} // When button is released
       >
         <Text style={styles.generateButtonText}>GENERATE OUTFIT</Text>
       </Pressable>
+
+      {/* Generate Outfit Modal */}
+      <Modal visible={isModalVisible} transparent={true} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Generated Outfit:</Text>
+              {/*generatedImage && <Image source={{ uri: generatedImage }} style={styles.generatedImage} />*/}
+              <Text style={styles.modalText}>Would you like to save this outfit?</Text>
+              <View style={styles.modalButton}>
+                <Button title="Yes" onPress={() => setIsCategorySelectionVisible(true)} />
+                <Button title="No" onPress={() => setIsModalVisible(false)} />
+              </View>
+          </View>
+        </View>
+      </Modal>
 
       <Text style={styles.sectionHeader}>Saved Outfits</Text>
 
@@ -201,6 +220,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 15,
   },
+  modalText: {
+    fontSize: 18,
+    paddingBottom: 10,
+  },
+  modalButton: {
+		flexDirection: 'row',
+		justifyContent: 'space-around',
+		width: '60%',
+		borderRadius: 10,
+		backgroundColor: '#ffffff',
+	},
   notificationBox: {
     backgroundColor: "#F9F9F9",
     borderRadius: 8,
