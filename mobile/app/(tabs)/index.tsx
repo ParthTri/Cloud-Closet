@@ -7,6 +7,7 @@ import {
   Button,
   ScrollView,
   Modal,
+  Alert,
 } from "react-native";
 import { useAuth } from "../authContext";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
@@ -22,14 +23,24 @@ export default function HomePage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
   const [isCategorySelectionVisible, setIsCategorySelectionVisible] = useState(false);
-  
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [uploading, setUploading] = useState(false);
+
   const API_Weather = "https://cloudcloset.kolide.co.nz/api/weather";
+  const OUTFIT_CATEGORIES_API_URL = 'http://cloudcloset.kolide.co.nz/api/outfitCategory/allMethod';
 
   const [weatherData, setWeatherData] = useState({
     weather: "Loading...",
     temperature: null,
     location: "",
   });
+
+  interface Category {
+    categoryID: number;
+    name: string;
+  }
 
   const fetchWeatherData = async () => {
     try {
@@ -61,11 +72,46 @@ export default function HomePage() {
     }
   };
 
+  // updated uploadImage, selectedCategory, saveImageWithCategories, fetchOutfitCategories & useEffect
+  const uploadImage = async () => {
+    if (!selectedImage || selectedCategories.length === 0) {
+      	Alert.alert('Error', 'Please select at least one category');
+      	return;
+    }
+    setUploading(true);
+  };
+
+  const selectedCategory = (categoryID: number) => {
+    if (selectedCategories.includes(categoryID)) {
+      setSelectedCategories(selectedCategories.filter((id) => id !== categoryID));
+    } else {
+      setSelectedCategories([...selectedCategories, categoryID]);
+    }
+  };
+
+  const saveImageWithCategories = async () => {
+    await uploadImage();
+    setSelectedCategories([]);
+    setIsModalVisible(false);
+  };
+
+  const fetchOutfitCategories = async () => {
+    try {
+      const response = await axios.get(OUTFIT_CATEGORIES_API_URL);
+      if (Array.isArray(response.data.data)) {
+        setCategories(response.data.data);
+      } else {
+        console.error('Unexpected response format:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching outfit categories:', error);
+    }
+  };
+
   useEffect(() => {
     fetchWeatherData(); // Fetch weather data when the component mounts
+    fetchOutfitCategories(); // Fetch outfit categories
   }, []);
-
-  
  
   // test - need to replace??? with actual notifs
   const notifications = [
@@ -118,7 +164,7 @@ export default function HomePage() {
 	<View style={styles.weatherContainer}>
         <View style={styles.weatherInfo}>
 		<Image
-          source={require('../../assets/weather/cloudy.png')} // Replace with a dynamic image later
+          source={require('../../assets/weather/cloudy-1.png')} // Replace with a dynamic image later
           style={styles.weatherIcon}
         />
           <View style={styles.weatherTextContainer}>
@@ -138,9 +184,12 @@ export default function HomePage() {
           styles.generateButton,
           { backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" }, // Change color based on state
         ]}
-        onPressIn={() => setButtonPressed(true)} // When button is pressed - show modal 
-        onPress={() => setIsModalVisible(true)} // - show modal 
-        onPressOut={() => setButtonPressed(false)} // When button is released
+        onPressIn={() => setButtonPressed(true)}  
+        onPress={() => {
+          setIsModalVisible(true);                
+          setButtonPressed(false);                 
+        }}
+        onPressOut={() => setButtonPressed(false)} 
       >
         <Text style={styles.generateButtonText}>GENERATE OUTFIT</Text>
       </Pressable>
@@ -149,6 +198,8 @@ export default function HomePage() {
       <Modal visible={isModalVisible} transparent={true} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
+          {!isCategorySelectionVisible ? (
+            <>
               <Text style={styles.modalTitle}>Generated Outfit:</Text>
               {/*generatedImage && <Image source={{ uri: generatedImage }} style={styles.generatedImage} />*/}
               <Text style={styles.modalText}>Would you like to save this outfit?</Text>
@@ -156,6 +207,30 @@ export default function HomePage() {
                 <Button title="Yes" onPress={() => setIsCategorySelectionVisible(true)} />
                 <Button title="No" onPress={() => setIsModalVisible(false)} />
               </View>
+              </> 
+              ) : (
+                <>
+                <Text style={styles.modalText}>Select categories:</Text>
+                <ScrollView style={styles.categoriesContainer} horizontal={true}>
+                {categories.map((category) => (
+                  <Pressable
+                    key={category.categoryID}
+                    onPress={() => selectedCategory(category.categoryID)}
+                    style={[
+                      styles.categoryButton,
+                      selectedCategories.includes(category.categoryID) && styles.selectedCategory,
+                    ]}
+                  >
+                    <Text style={styles.categoryText}>{category.name}</Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+              <View style={styles.modalButton}>
+                <Button title="Save" onPress={saveImageWithCategories} />
+                <Button title="Cancel" onPress={() => setIsModalVisible(false)} />
+			  </View>
+            </>
+          )}
           </View>
         </View>
       </Modal>
@@ -336,4 +411,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
+  categoriesContainer: {
+		maxHeight: 60,
+        flexDirection: 'row',
+    },
+    categoryButton: {
+        backgroundColor: '#eee',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        margin: 5,
+        borderRadius: 10,
+		    maxHeight: 40,
+    },
+    selectedCategory: {
+        backgroundColor: '#007AFF', 
+    },
+    categoryText: {
+        color: '#000',
+        fontSize: 16,
+    },
 });
