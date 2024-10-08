@@ -1,5 +1,14 @@
 import React from "react";
-import { View, Pressable, Text, Image, StyleSheet } from "react-native";
+import { 
+	SafeAreaView,
+	ScrollView,
+	TouchableOpacity,
+	View, 
+	Pressable, 
+	Text, 
+	Image, 
+	StyleSheet
+ } from "react-native";
 import { useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
