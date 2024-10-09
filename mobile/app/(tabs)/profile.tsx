@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function Profile() {
   const router = useRouter();
@@ -108,14 +107,14 @@ export default function Profile() {
           <Text style={styles.sectionTitle}>Support</Text>
           <View style={styles.sectionBody}>
             <TouchableOpacity style={styles.row}>
-              <MaterialIcons name="contacts" size={20} color="a69f9f" />
               <Text style={styles.rowLabel}>Help & Support</Text>
+			  <View style={styles.rowSpacer} />
               <AntDesign name="right" size={19} color="#bcbcbc" />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.row}>
-              <MaterialIcons name="shield" size={24} color="a69f9f" />
               <Text style={styles.rowLabel}>Privacy Policy</Text>
+			  <View style={styles.rowSpacer} />
               <AntDesign name="right" size={19} color="#bcbcbc" />
             </TouchableOpacity>
           </View>
@@ -198,6 +197,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
   profileAvatar: {
     width: 60,
@@ -248,6 +255,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 12,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
   logoutText: {
     fontSize: 16,
