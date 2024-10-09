@@ -45,21 +45,6 @@ async function getUserItems(
   }
 }
 
-// API URLS 
-
-interface Category {
-	categoryID: number;
-	name: string;
-  }
-
-  const { width } = Dimensions.get("window");
-
-  const sampleImages = [
-	{ id: 1, url: "https://via.placeholder.com/150" },
-	{ id: 2, url: "https://via.placeholder.com/150" },
-	{ id: 3, url: "https://via.placeholder.com/150" },
-];
-
 export default function Outfits() {
   const { user } = useAuth();
   const userID: string | undefined = user?.userID;
@@ -382,11 +367,6 @@ const styles = StyleSheet.create({
         color: '#000',
         fontSize: 16,
     },
-	outfitImage: {
-		width: 100,
-		height: 100,
-		borderRadius: 8,
-	},
 	sliderImage: {
 		width: 100,
 		height: 100,
