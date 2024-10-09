@@ -1,4 +1,4 @@
-import { Controller, Get, Body } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { GenOutfitDTO } from './interface/genOutfit.dto';
 import { GenOutfitService } from './genOutfit.service';
 
@@ -6,7 +6,7 @@ import { GenOutfitService } from './genOutfit.service';
 export class GenOutfitController {
   constructor(private readonly genService: GenOutfitService) {}
 
-  @Get()
+  @Post()
   async generateOutfit(@Body() input: GenOutfitDTO) {
     return await this.genService.generateOutft(input);
   }
