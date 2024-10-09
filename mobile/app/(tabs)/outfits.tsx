@@ -112,12 +112,74 @@ export default function Outfits() {
     fetchOutfitCategories();
   }, []);
 
+	const [selectedTops, setSelectedTops] = useState<string | null>(null);
+	const [selectedBottoms, setSelectedBottoms] = useState<string | null>(null);
+	const [selectedShoes, setSelectedShoes] = useState<string | null>(null);
+	const [uploading, setUploading] = useState(false);
 
-  const handleLeftPress = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? currentImages.length - 1 : prevIndex - 1
-    );
-  };
+	{/* Function to fetch outfit categories */}
+
+	// Upload Outfit function 
+	const uploadOutfit = async () => {
+		// Ensure that all required categories are selected (tops, bottoms, shoes)
+		if (!selectedTops || !selectedBottoms || !selectedShoes) {
+		Alert.alert('Error', 'Please select items for all categories: tops, bottoms, and shoes');
+		return;
+		}
+	
+		setUploading(true);
+	
+		try {
+			// Create an outfit object containing the selected items
+			const outfit = {
+				tops: selectedTops,          // Predefined tops selection
+				bottoms: selectedBottoms,    // Predefined bottoms selection
+				shoes: selectedShoes,        // Predefined shoes selection
+				userID: user?.userID,        // The user's ID from authentication context
+			};
+		
+			// Post the outfit to your server or API
+			await axios.post(SAVE_OUTFIT_API_URL, outfit, {
+				headers: { 'Content-Type': 'application/json' },
+			});
+		
+			// Display success message and reset selections
+			Alert.alert('Upload successful', 'Your outfit has been uploaded successfully.');
+			setSelectedTops(null);
+			setSelectedBottoms(null);
+			setSelectedShoes(null);
+		} catch (error) {
+			console.error('Upload error:', error);
+			Alert.alert('Upload failed', 'There was an error uploading your outfit.');
+		} finally {
+			setUploading(false);
+		}
+	};
+	
+	useEffect(() => {
+		const fetchTopsImages = async () => {
+			const items = await getUserItems(userID, "tops"); // should be fine once upload function is added
+			setTopsImages(items);
+		};
+		const fetchBottomsImages = async () => {
+			const items = await getUserItems(userID, "bottoms"); // should be fine once upload function is added
+			setBottomsImages(items);
+		};
+		const fetchShoesImages = async () => {
+			const items = await getUserItems(userID, "shoes"); // should be fine once upload function is added
+			setShoesImages(items);
+		};
+		{/* fetch outfit categories here */}
+		fetchTopsImages();
+		fetchBottomsImages();
+		fetchShoesImages();
+	}, []);
+	  
+	const handleLeftPress = () => {
+		setCurrentIndex((prevIndex) =>
+			prevIndex === 0 ? topsImages.length - 1 : prevIndex - 1
+		);
+	};
 
   const handleRightPress = () => {
     setCurrentIndex((prevIndex) =>
@@ -125,10 +187,10 @@ export default function Outfits() {
     );
   };
 
-  const saveOutfitWithCategories = async () => {
-	//await uploadImage();
-	setSelectedCategories([]);
-  };
+	const saveOutfitWithCategories = async () => {
+		//await uploadOutfit(); 
+		setSelectedCategories([]);
+	  };
 
 // Function to select a category
   const selectedCategory = (categoryID: number) => {
@@ -159,30 +221,31 @@ export default function Outfits() {
         <MaterialIcons name="swipe" size={30} color="black" />
       </View>
 
-      <ScrollView>
-        {/* Tops Slider */}
-        <Text style={styles.sliderTitleText}>Tops</Text>
-        <View style={styles.sliderContainer}>
-          {/* Left Button */}
-          <Pressable onPress={handleLeftPress}>
-            <Entypo name="chevron-thin-left" size={50} color="#8ABAE3"/>
-          </Pressable>
+			<ScrollView>
+				{/* Tops Slider */}
+				<Text style={styles.sliderTitleText}>Tops</Text>
+				<View style={styles.sliderContainer}>
+					
+					{/* Left Button */}
+					<Pressable onPress={handleLeftPress}>
+						<Entypo name="chevron-thin-left" size={50} color="#8ABAE3"/>
+					</Pressable>
 
-          {/* get Tops photos for slider */}
-          {topsImages.length > 0 ? (
-            <Image
-              source={{ uri: topsImages[currentIndex]?.imageURL }} 
-              style={styles.sliderImage} 
-            />
-          ) : (
-            <Text>Loading 'Tops' Images...</Text>
-          )}
-          
-          {/* Right Button */}
-          <Pressable onPress={handleRightPress}>
-            <Entypo name="chevron-thin-right" size={50} color="#8ABAE3"/>
-          </Pressable>
-        </View>
+					{/* Getting Bottoms Images for Slider */}
+					{topsImages.length > 0 ? (
+					<Image
+						source={{ uri: topsImages[currentIndex]?.imageURL }} 
+						style={styles.sliderImage} 
+					/>
+					) : (
+					<Text>Loading 'Tops' Images...</Text>
+					)}
+					
+					{/* Right Button */}
+					<Pressable onPress={handleRightPress}>
+						<Entypo name="chevron-thin-right" size={50} color="#8ABAE3"/>
+					</Pressable>
+				</View>
 
         {/* Bottoms Slider */}
         <Text style={styles.sliderTitleText}>Bottoms</Text>
@@ -287,20 +350,20 @@ export default function Outfits() {
         </View>
 
         {/* Save Match Button */}
-        <Pressable
-          style={[
-            styles.saveButton,
-            { backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" }, //Change color according to status
-          ]}
-          onPressIn={() => setButtonPressed(true)} // When the button is pressed
-          onPress={saveOutfit} // Save Match
-          onPressOut={() => setButtonPressed(false)} // When the button is released
-        >
-          <Text style={styles.saveButtonText}>SAVE OUTFIT</Text>
-        </Pressable>
-      </ScrollView>
-    </View>
-  );
+		<Pressable
+			style={[
+				styles.saveButton,
+				{ backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" }, // Change color based on state
+				]}
+				onPressIn={() => setButtonPressed(true)} // When button is pressed
+				onPress={saveOutfitWithCategories} // Save Outfit with Categories
+				onPressOut={() => setButtonPressed(false)} // When button is released
+				>
+					<Text style={styles.saveButtonText}>SAVE OUTFIT</Text>
+		</Pressable>
+		</ScrollView>
+	</View>
+	);
 }
 
 const styles = StyleSheet.create({

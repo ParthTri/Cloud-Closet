@@ -62,7 +62,7 @@ export default function Upload() {
 			
 			let photo =  await cameraRef.current.takePictureAsync(options);
 
-		if (photo && photo.uri) {
+		if (photo.uri) { // only an error until picture is taken (photo becomes defined)
 			setSelectedImage(photo.uri);
 			setIsModalVisible(true);
 		} else {
