@@ -1,7 +1,16 @@
-export interface GenOutfitDTO {
+import { ApiProperty } from '@nestjs/swagger';
+
+export class GenOutfitDTO {
+  @ApiProperty()
   userId: string;
+
+  @ApiProperty()
   longitude: number;
+
+  @ApiProperty()
   latitude: number;
+
+  @ApiProperty()
   type: OutfitType;
 }
 
