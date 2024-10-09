@@ -66,7 +66,8 @@ export class GenOutfitService {
           imageId,
           categoryId,
           ItemCategory (
-            name
+            name,
+            metaCategory
           )
         )
         `,
@@ -90,30 +91,36 @@ export class GenOutfitService {
     let TOP = false;
     let BOTTOMS = false;
     let JACKET = false;
-    // let DRESS = false;
+    let FOOTWEAR = false;
     outfit.forEach((item) => {
       if (item['ImageCategory'].length > 1) {
         item['ImageCategory'].forEach((cat) => {
-          const name: string = cat['ItemCategory']['name'];
+          const meta: string = cat['ItemCategory']['metaCategory'];
           if (req.type == OutfitType.FORMAL) {
-            if (!TOP && name == 'shirt') {
+            if (!TOP && meta == 'TOP') {
               payload.push(item);
               TOP = true;
-            } else if (!BOTTOMS && name == 'pants') {
+            } else if (!BOTTOMS && meta == 'BOTTOM') {
               payload.push(item);
               BOTTOMS = true;
-            } else if (!JACKET && name == 'cardigan') {
+            } else if (!FOOTWEAR && meta == 'FOOTWEAR') {
+              payload.push(item);
+              FOOTWEAR = true;
+            } else if (!JACKET && meta == 'JACKET') {
               payload.push(item);
               JACKET = true;
             }
           } else {
-            if (!TOP && name == 't-shirt') {
+            if (!TOP && meta == 'TOP') {
               payload.push(item);
               TOP = true;
-            } else if (!BOTTOMS && (name == 'pants' || name == 'shorts')) {
+            } else if (!BOTTOMS && meta == 'BOTTOM') {
               payload.push(item);
               BOTTOMS = true;
-            } else if (!JACKET && name == 'down jacket') {
+            } else if (!FOOTWEAR && meta == 'FOOTWEAR') {
+              payload.push(item);
+              FOOTWEAR = true;
+            } else if (!JACKET && meta == 'JACKET') {
               payload.push(item);
               JACKET = true;
             }
