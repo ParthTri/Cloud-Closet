@@ -15,7 +15,7 @@ interface Category {
   timestamp: string;
 }
 
-const { width } = Dimensions.get("window");
+//const { width } = Dimensions.get("window");
 
 async function getUserItems(
   userID: string | undefined,
@@ -45,6 +45,21 @@ async function getUserItems(
   }
 }
 
+// API URLS 
+
+interface Category {
+	categoryID: number;
+	name: string;
+  }
+
+  const { width } = Dimensions.get("window");
+
+  const sampleImages = [
+	{ id: 1, url: "https://via.placeholder.com/150" },
+	{ id: 2, url: "https://via.placeholder.com/150" },
+	{ id: 3, url: "https://via.placeholder.com/150" },
+];
+
 export default function Outfits() {
   const { user } = useAuth();
   const userID: string | undefined = user?.userID;
@@ -65,7 +80,6 @@ export default function Outfits() {
   const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  
   const searchForItem = async (search: string) => {
     const filter = selectedCategories.join(','); 
     await getUserItems(userID, filter).then((x) => {
@@ -74,7 +88,7 @@ export default function Outfits() {
   };
 
   // Function to get clothing category
-  const fetchCategories = async () => {
+  const fetchOutfitCategories = async () => {
     try {
       const response = await axios.get(OUTFIT_CATEGORIES_API_URL);
       if (Array.isArray(response.data.data)) {
@@ -88,7 +102,6 @@ export default function Outfits() {
     }
   };
 
- 
   const saveOutfit = async () => {
     try {
       const outfitData = {
@@ -113,7 +126,7 @@ export default function Outfits() {
 
   useEffect(() => {
     // getUserItems(userID, "").then((x) => setItems(x));
-    fetchCategories();
+    fetchOutfitCategories();
   }, []);
 
 
@@ -128,6 +141,12 @@ export default function Outfits() {
       prevIndex === currentImages.length - 1 ? 0 : prevIndex + 1
     );
   };
+
+  const saveOutfitWithCategories = async () => {
+	//await uploadImage();
+	setSelectedCategories([]);
+  };
+
 // Function to select a category
   const selectedCategory = (categoryID: number) => {
     if (selectedCategories.includes(categoryID)) {
@@ -231,7 +250,7 @@ export default function Outfits() {
         </View>
         
         {/* Category selection */}
-        <Text style={styles.sliderTitleText}>Select categories:</Text>
+        <Text style={styles.selectCategoryTitleText}>Select categories:</Text>
         {isLoadingCategories ? (
           <Text>Loading categories...</Text>
         ) : fetchError ? (
@@ -242,26 +261,8 @@ export default function Outfits() {
             </Pressable>
           </View>
         ) : (
+		<ScrollView horizontal>
           <View style={styles.categoriesContainer}>
-            {/* {categories.map((category) => (
-              <Pressable
-                key={category.id}
-                style={[
-                  styles.categoryButton,
-                  selectedCategories.includes(category.id) && styles.selectedCategory,
-                ]}
-                onPress={() => selectedCategory(category.id)}
-              >
-                <Text
-                  style={[
-                    styles.categoryText,
-                    selectedCategories.includes(category.id) && { color: '#FFFFFF' },
-                  ]}
-                >
-                  {category.name}
-                </Text>
-              </Pressable>
-            ))} */}
              {categories.map((category) => (
                   <Pressable
                     key={category.id}
@@ -275,6 +276,7 @@ export default function Outfits() {
                   </Pressable>
                 ))}
           </View>
+		</ScrollView>
         )}
 
         {/* Outfit Name Input */}
@@ -319,118 +321,128 @@ export default function Outfits() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#FFFFFF",
-    paddingTop: 55,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  sliderTitleText: {
-    color: "#8ABAE3",
-    paddingVertical: 20,
-    paddingHorizontal: 10,
-    fontWeight: "bold",
-    fontSize: 20,
-  },
-  saveButton: {
-    backgroundColor: "#8ABAE3",
-    borderRadius: 15,
-    paddingVertical: 10,
-    paddingHorizontal: 30,
-    marginTop: 20,
-    alignItems: "center",
-    borderWidth: 2,
-  },
-  saveButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  categoriesContainer: {
-    maxHeight: 100, 
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-  },
-  categoryButton: {
-    backgroundColor: '#eee',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    margin: 5,
-    borderRadius: 10,
-    maxHeight: 40,
-  },
-  selectedCategory: {
-    backgroundColor: '#007AFF', 
-  },
-  categoryText: {
-    color: '#000',
-    fontSize: 16,
-  },
-  retryButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#8ABAE3',
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  retryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  sliderImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
-  },
-  sliderContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  outfitNameText: {
-    color: "#8ABAE3",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    fontWeight: "bold",
-    fontSize: 20,
-  },
-  textInputText: {
-    flex: 1, 
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center", 
-    color: "#000000",
-    backgroundColor: "#D0D0D0",
-    borderRadius: 5,
-    padding: 10, 
-    paddingHorizontal: 10,
-    fontSize: 14, 
-    borderWidth: 1, 
-    borderColor: "#A0A0A0", 
-  },
-  outfitNameContainer: { 
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  iconLabel: {
-    marginLeft: 5,                
-    fontSize: 12,                 
-    color: '#666',
-  },
-  iconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8, 
-  },
+	container: {
+		flex: 1,
+		padding: 20,
+		backgroundColor: "#FFFFFF",
+		paddingTop: 55,
+	},
+	headerContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+	},
+	header: {
+		fontSize: 24,
+		fontWeight: "bold",
+	},
+	sliderTitleText: {
+		color: "#8ABAE3",
+		paddingVertical: 40,
+		paddingHorizontal: 10,
+		fontWeight: "bold",
+		fontSize: 20,
+	},
+	selectCategoryTitleText : {
+		color: "#8ABAE3",
+		paddingHorizontal: 10,
+		paddingBottom: 5,
+		fontWeight: "bold",
+		fontSize: 20,
+	},
+	saveButton: {
+		backgroundColor: "#8ABAE3",
+		borderRadius: 15,
+		paddingVertical: 10,
+		paddingHorizontal: 30,
+		marginTop: 20,
+		alignItems: "center",
+		borderWidth: 2,
+	  },
+	saveButtonText: {
+		fontSize: 18,
+		fontWeight: "bold",
+	  },
+	categoriesContainer: {
+		maxHeight: 60,
+        flexDirection: 'row',
+    },
+    categoryButton: {
+        backgroundColor: '#eee',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        margin: 5,
+        borderRadius: 10,
+		maxHeight: 40,
+    },
+    selectedCategory: {
+        backgroundColor: '#007AFF', 
+    },
+    categoryText: {
+        color: '#000',
+        fontSize: 16,
+    },
+	outfitImage: {
+		width: 100,
+		height: 100,
+		borderRadius: 8,
+	},
+	sliderImage: {
+		width: 100,
+		height: 100,
+		borderRadius: 8,
+	},
+	sliderContainer: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: 20,
+	},
+	retryButton: {
+		marginTop: 10,
+		padding: 10,
+		backgroundColor: '#8ABAE3',
+		borderRadius: 5,
+		alignItems: 'center',
+	},
+	retryButtonText: {
+		color: '#FFFFFF',
+		fontSize: 16,
+	},
+	outfitNameText: {
+		color: "#8ABAE3",
+		paddingVertical: 10,
+		paddingHorizontal: 10,
+		fontWeight: "bold",
+		fontSize: 20,
+	},
+	textInputText: {
+		flex: 1, 
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center", 
+		color: "#000000",
+		backgroundColor: "#D0D0D0",
+		borderRadius: 5,
+		padding: 10, 
+		paddingHorizontal: 10,
+		fontSize: 14, 
+		borderWidth: 1, 
+		borderColor: "#A0A0A0", 
+	  },
+	  outfitNameContainer: { 
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginTop: 10,
+	  },
+	  iconLabel: {
+		marginLeft: 5,                
+		fontSize: 12,                 
+		color: '#666',
+	  },
+	  iconContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: 8, 
+	  },
 });
