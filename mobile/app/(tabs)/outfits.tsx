@@ -15,8 +15,6 @@ interface Category {
   timestamp: string;
 }
 
-//const { width } = Dimensions.get("window");
-
 async function getUserItems(
   userID: string | undefined,
   filter: string
@@ -46,20 +44,20 @@ async function getUserItems(
 }
 
 export default function Outfits() {
-  const { user } = useAuth();
-  const userID: string | undefined = user?.userID;
- 
-  const [items, setItems] = useState<any[]>([]);
-  const [buttonPressed, setButtonPressed] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]); // save category
-  const [topsImages, setTopsImages] = useState<any[]>([]);
-  const [bottomsImages, setBottomsImages] = useState<any[]>([]);
-  const [footwearImages, setFootwearImages] = useState<any[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [outfitName, setOutfitName] = useState<string>('');
-  const [isEditable, setIsEditable] = useState(true);
-  const [currentImages, setCurrentImages] = useState<any[]>([]);
+	const { user } = useAuth();
+	const userID: string | undefined = user?.userID;
+   
+	const [items, setItems] = useState<any[]>([]);
+	const [buttonPressed, setButtonPressed] = useState(false);
+	const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+	const [categories, setCategories] = useState<Category[]>([]); // save category
+	const [topsImages, setTopsImages] = useState<any[]>([]);
+	const [bottomsImages, setBottomsImages] = useState<any[]>([]);
+	const [footwearImages, setFootwearImages] = useState<any[]>([]);
+	const [currentIndex, setCurrentIndex] = useState(0);
+	const [outfitName, setOutfitName] = useState<string>('');
+	const [isEditable, setIsEditable] = useState(true);
+	const [currentImages, setCurrentImages] = useState<any[]>([]);
 
  // Loading category data status
   const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
