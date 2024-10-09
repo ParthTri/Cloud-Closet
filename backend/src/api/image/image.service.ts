@@ -127,7 +127,7 @@ export class ImageService {
         .select('id')
         .eq('name', name.toLowerCase());
 
-      if (error) {
+      if (error || !data[0]) {
         return;
       }
 
