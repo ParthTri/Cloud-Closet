@@ -53,7 +53,7 @@ export default function Outfits() {
 	const [categories, setCategories] = useState<Category[]>([]); // save category
 	const [topsImages, setTopsImages] = useState<any[]>([]);
 	const [bottomsImages, setBottomsImages] = useState<any[]>([]);
-	const [footwearImages, setFootwearImages] = useState<any[]>([]);
+	const [shoesImages, setShoesImages] = useState<any[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [outfitName, setOutfitName] = useState<string>('');
 	const [isEditable, setIsEditable] = useState(true);
@@ -210,7 +210,7 @@ export default function Outfits() {
       const filteredItems = items.filter(item => selectedCategories.includes(item.categoryID));
       setCurrentImages(filteredItems);
     }
-  }, [selectedCategories, topsImages, bottomsImages, footwearImages, items]);
+  }, [selectedCategories, topsImages, bottomsImages, shoesImages, items]);
 
   return (
     <View style={styles.container}>
@@ -280,9 +280,9 @@ export default function Outfits() {
           </Pressable>
           
           {/* Get the Footwear image for the slider */}
-          {footwearImages.length > 0 ? (
+          {shoesImages.length > 0 ? (
             <Image
-              source={{ uri: footwearImages[currentIndex]?.imageURL }} 
+              source={{ uri: shoesImages[currentIndex]?.imageURL }} 
               style={styles.sliderImage} 
             />
           ) : (
