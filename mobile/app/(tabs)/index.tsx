@@ -36,7 +36,7 @@ export default function HomePage() {
         longitude: 174.763336,
     });
 
-      console.log("Weather data response:", response.data); 
+      //console.log("Weather data response:", response.data); 
 
       const { data, error } = response.data;
 
@@ -73,6 +73,7 @@ export default function HomePage() {
     fetchWeatherData(latitude, longitude);
   }, []);
 
+
   interface WeatherProps {
     weather: string;
     temperature: number | null;
@@ -80,29 +81,31 @@ export default function HomePage() {
   
   const Weather: React.FC<WeatherProps> = ({ weather, temperature }) => {
     const weatherImages: { [key: string]: any } = {
-      Clear: require('../../assets/weather/clear.png'),
-      Clouds: require('../../assets/weather/cloudy-2.png'),
-      Rain: require('../../assets/weather/rain.png'),
-      Snow: require('../../assets/weather/snow.png'),
-      Thunderstorm: require('../../assets/weather/thunderstorm.png'),
-      Drizzle: require('../../assets/weather/drizzle.png'),
-      Mist: require('../../assets/weather/mist.png'),
+      Clear: require('../../assets/weather/sun.png'),
+      Clouds: require('../../assets/weather/cloudy.png'),
+      Rain: require('../../assets/weather/rainy-1.png'),
+      Thunderstorm: require('../../assets/weather/storm-1.png'),
+      Drizzle: require('../../assets/weather/rainy.png'),
+      Atmosphere: require('../../assets/weather/foog.png'),
     };
   
-    const weatherImage = weatherImages[weather] || require('../../assets/weather/default.png'); // Default image
+    const weatherImage = weatherImages[weather] || require('../../assets/weather/night.png'); // Default image - need to find one
   
     return (
-      <View style={{ alignItems: 'center' }}>
-        <Text style={styles.weatherCondition}>{weather}</Text>
-        <Image source={weatherImage} style={styles.weatherImage} />
-        <Text style={styles.weatherTemp}>{temperature !== null ? `${temperature}°C` : "N/A"}</Text>
+      <View style={styles.weatherContainer}>
+        <View style={styles.weatherInfo}>
+          <Image source={weatherImage} style={styles.weatherImage} />
+          <View style={styles.weatherTextContainer}>
+            <Text style={styles.weatherDate}>Today</Text>
+            <Text style={styles.weatherTemp}>
+              {weatherData.temperature !== null ? `${weatherData.temperature}°C` : "N/A"}
+            </Text>
+            <Text style={styles.weatherLocation}>{weatherData.location || "Unknown Location"}</Text>
+          </View>
+        </View>
       </View>
     );
   };
-
-
-
-
  
   // test - need to replace??? with actual notifs
   const notifications = [
@@ -152,27 +155,12 @@ export default function HomePage() {
         </View>
       </Modal>
 
-
-	{/* Weather Info */}
-  {loading ? (
-        <Text>Loading weather data...</Text> // Show loading text
-      ) : (
-        <View style={styles.weatherContainer}>
-          <View style={styles.weatherInfo}>
-            <Image
-              source={require('../../assets/weather/cloudy.png')} // Replace with a dynamic image later
-              style={styles.weatherIcon}
-            />
-            <View style={styles.weatherTextContainer}>
-              <Text style={styles.weatherDate}>Today</Text>
-              <Text style={styles.weatherTemp}>
-                {weatherData.temperature !== null ? `${weatherData.temperature}°C` : "test"}
-              </Text>
-              <Text style={styles.weatherLocation}>{weatherData.location}</Text>
-            </View>
-          </View>
-        </View>
-      )}
+        {/* Weather Info - added most of the design to the return statement*/}
+        {loading ? (
+          <Text>Loading weather data...</Text>
+        ) : (
+            <Weather weather={weatherData.weather} temperature={weatherData.temperature} />
+        )}
 
       {/* Generate Outfit Button */}
       <Pressable
@@ -279,7 +267,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignItems: "stretch",
     borderWidth: 2,
-	flexDirection: "row",
+	  flexDirection: "row",
   },
   weatherInfo: {
     flexDirection: "row",
@@ -298,31 +286,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 5,
   },
-  weatherIcon: {
-    width: 65,
-    height: 65,
+  weatherImage: {
+    width: 100,
+    height: 100,
     marginRight: 15,
   },
   weatherTemp: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: "bold",
-  },
-  weatherContainer: {
-    backgroundColor: "#F1F1F1",
-    borderRadius: 15,
-    padding: 20,
-    marginTop: 20,
-    alignItems: "center",
-    borderWidth: 2,
   },
   weatherCondition: {
     fontSize: 24,
     fontWeight: "bold",
-  },
-  weatherImage: {
-    width: 100,
-    height: 100,
-    marginVertical:
   },
   generateButton: {
     backgroundColor: "#8ABAE3",
