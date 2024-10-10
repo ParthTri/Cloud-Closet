@@ -1,4 +1,4 @@
-import { View, Text, Button, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet, TextInput } from "react-native";
+import { View, Text, Button, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet, TextInput, ActivityIndicator } from "react-native";
 import { MaterialIcons, Entypo, Ionicons } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
 import { useAuth } from '../authContext';
@@ -54,6 +54,7 @@ export default function Outfits() {
 	const [topsImages, setTopsImages] = useState<any[]>([]);
 	const [bottomsImages, setBottomsImages] = useState<any[]>([]);
 	const [footwearImages, setFootwearImages] = useState<any[]>([]);
+
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [outfitName, setOutfitName] = useState<string>('');
 	const [isEditable, setIsEditable] = useState(true);
@@ -120,7 +121,7 @@ export default function Outfits() {
 	const [isEditable, setIsEditable] = useState(true);
 	
 	const [currentImages, setCurrentImages] = useState(topsImages);
-
+	
 	const searchForItem = async (search: string) => {
 		await getUserItems(userID, search).then((x) => {
 			setItems(x["data"]);
@@ -394,8 +395,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
 	sliderImage: {
-		width: 100,
-		height: 100,
+		width: 150,
+		height: 150,
 		borderRadius: 8,
 	},
 	sliderContainer: {
