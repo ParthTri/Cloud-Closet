@@ -20,7 +20,7 @@ export default function Profile() {
   });
 
   const goToHome = () => {
-    router.push("../auth/signin");
+    router.push("/(tabs)");
   };
 
   return (
@@ -28,12 +28,11 @@ export default function Profile() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => {
-            // handle back press
-          }}
+          onPress={goToHome}
           style={styles.headerAction}
         >
           <AntDesign name="arrowleft" size={24} color="#000" />
+
         </TouchableOpacity>
         <Text numberOfLines={1} style={styles.headerTitle}>
           Profile
