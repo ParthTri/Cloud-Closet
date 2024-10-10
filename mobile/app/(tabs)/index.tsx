@@ -12,13 +12,14 @@ import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-//import { WeatherController } from './weather.controller';
 
 export default function HomePage() {
   const { user, logout } = useAuth(); // Get user data from AuthContext
   const [modalVisible, setModalVisible] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
-  
+  const [loading, setLoading] = useState(true);
+
+  //weather API
   const API_Weather = "https://cloudcloset.kolide.co.nz/api/weather";
 
   const [weatherData, setWeatherData] = useState({
@@ -27,18 +28,18 @@ export default function HomePage() {
     location: "",
   });
 
-  
-  const fetchWeatherData = async () => {
+  const fetchWeatherData = async (latitude: number, longitude: number) => {
+    setLoading(true);
     try {
-      const response = await axios.get(API_Weather, {
-        data: {
-          latitude: -36.848461,
-          longitude: 174.763336,
-        }
-      });
+      const response = await axios.post(API_Weather, {
+        latitude: -36.848461,
+        longitude: 174.763336,
+    });
+
+      console.log("Weather data response:", response.data); 
 
       const { data, error } = response.data;
-      
+
       if (error) {
         throw new Error(error);
       }
@@ -48,19 +49,58 @@ export default function HomePage() {
         temperature: data.temperature,
         location: data.location,
       });
-    } catch (error) {
-      console.error("Error fetching weather data:", error);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error:", error.response ? error.response.data : error.message);
+      } else if (error instanceof Error) {
+        console.error("Error:", error.message);
+      } else {
+        console.error("An unknown error occurred");
+      }
       setWeatherData({
         weather: "Unavailable",
         temperature: null,
         location: "",
       });
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
   useEffect(() => {
-    fetchWeatherData(); // Fetch weather data when the component mounts
+    const latitude = -36.848461; 
+    const longitude = 174.763336; 
+    fetchWeatherData(latitude, longitude);
   }, []);
+
+  interface WeatherProps {
+    weather: string;
+    temperature: number | null;
+  }
+  
+  const Weather: React.FC<WeatherProps> = ({ weather, temperature }) => {
+    const weatherImages: { [key: string]: any } = {
+      Clear: require('../../assets/weather/clear.png'),
+      Clouds: require('../../assets/weather/cloudy-2.png'),
+      Rain: require('../../assets/weather/rain.png'),
+      Snow: require('../../assets/weather/snow.png'),
+      Thunderstorm: require('../../assets/weather/thunderstorm.png'),
+      Drizzle: require('../../assets/weather/drizzle.png'),
+      Mist: require('../../assets/weather/mist.png'),
+    };
+  
+    const weatherImage = weatherImages[weather] || require('../../assets/weather/default.png'); // Default image
+  
+    return (
+      <View style={{ alignItems: 'center' }}>
+        <Text style={styles.weatherCondition}>{weather}</Text>
+        <Image source={weatherImage} style={styles.weatherImage} />
+        <Text style={styles.weatherTemp}>{temperature !== null ? `${temperature}°C` : "N/A"}</Text>
+      </View>
+    );
+  };
+
+
 
 
  
@@ -112,22 +152,27 @@ export default function HomePage() {
         </View>
       </Modal>
 
-	<View style={styles.weatherContainer}>
-        <View style={styles.weatherInfo}>
-		<Image
-          source={require('../../assets/weather/cloudy.png')} // Replace with a dynamic image later
-          style={styles.weatherIcon}
-        />
-          <View style={styles.weatherTextContainer}>
-            <Text style={styles.weatherDate}>Today</Text> 
-            <Text style={styles.weatherTemp}>{weatherData.temperature}
-          
-			{weatherData.temperature !== null ? `${weatherData.temperature}°C`: "test"}  
-			</Text>
-            <Text style={styles.weatherLocation}>{weatherData.location}</Text>
+
+	{/* Weather Info */}
+  {loading ? (
+        <Text>Loading weather data...</Text> // Show loading text
+      ) : (
+        <View style={styles.weatherContainer}>
+          <View style={styles.weatherInfo}>
+            <Image
+              source={require('../../assets/weather/cloudy.png')} // Replace with a dynamic image later
+              style={styles.weatherIcon}
+            />
+            <View style={styles.weatherTextContainer}>
+              <Text style={styles.weatherDate}>Today</Text>
+              <Text style={styles.weatherTemp}>
+                {weatherData.temperature !== null ? `${weatherData.temperature}°C` : "test"}
+              </Text>
+              <Text style={styles.weatherLocation}>{weatherData.location}</Text>
+            </View>
           </View>
         </View>
-      </View>
+      )}
 
       {/* Generate Outfit Button */}
       <Pressable
@@ -261,6 +306,23 @@ const styles = StyleSheet.create({
   weatherTemp: {
     fontSize: 32,
     fontWeight: "bold",
+  },
+  weatherContainer: {
+    backgroundColor: "#F1F1F1",
+    borderRadius: 15,
+    padding: 20,
+    marginTop: 20,
+    alignItems: "center",
+    borderWidth: 2,
+  },
+  weatherCondition: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  weatherImage: {
+    width: 100,
+    height: 100,
+    marginVertical:
   },
   generateButton: {
     backgroundColor: "#8ABAE3",
