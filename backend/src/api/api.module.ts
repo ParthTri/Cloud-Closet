@@ -6,7 +6,7 @@ import { WeatherModule } from './weather/weather.module';
 import { CategoryModule } from './category/category.module';
 import { OutfitCategoryModule } from './outfitCategory/outfitCategory.module';
 import {OutfitModule} from './outfit/outfit.module';
-import { SharedModule } from './sharedModule';
+import { SharedModule } from './shareModule';
 
 @Module({
   imports: [SharedModule, UserModule, ImageModule, CategoryModule, WeatherModule, OutfitCategoryModule, OutfitModule],
