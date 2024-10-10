@@ -1,31 +1,60 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseHelper } from '../../database.helper';
-import { Category } from './category.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { SupabaseProvider } from 'src/supabase/supabase.service';
+import { CategoryDTO } from './interfaces/category.dto';
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    private readonly databaseHelper: DatabaseHelper,
+  constructor(private readonly supa: SupabaseProvider) {}
 
-    @InjectRepository(Category)
-    private categoryRepository: Repository<Category>,
-  ) {}
-
-  async getAllCategories(): Promise<Category[]> {
-    const x = await this.categoryRepository.find();
-    return x;
+  async getAllCategories(): Promise<{data, error}> {
+    const { data, error } = await this.supa
+      .getClient()
+      .from('ItemCategory')
+      .select('*');
+    return {data, error};
   }
 
-  async getCategoryById(id: bigint): Promise<Category> {
-    return await this.categoryRepository.findOneBy({ categoryID: id });
+  async getImageCategoryName(categoryId: number): Promise<{data, error}> {
+    const row = await this.supa
+      .getClient()
+      .from('ItemCategory')
+      .select('name')
+      .eq('id', categoryId);
+
+      if (row.error) {
+        return { data: null, error: row.error };
+      }
+      
+      console.log(row.data);
+      console.log(row.data[0].name);
+      
+      return { data: row.data[0].name, error: row.error};   
   }
 
-  async getUserCategory(id: string): Promise<Category[]> {
-    return await this.categoryRepository
-      .createQueryBuilder()
-      .where('userID = :userId', { userId: id })
-      .execute();
-  }
+  async getImageCategoriesByImageId(imageId: string): Promise<{data, error}>{
+    let categories = new Array <CategoryDTO>();
+      const rows = await this.supa
+      .getClient()
+      .from('ImageCategory')
+      .select('categoryId')
+      .eq('imageId', imageId);
+    if (rows.error) {
+      return { data: null, error: rows.error };
+    }
+    
+    for (const cat of rows.data)
+    {
+
+      let catId = cat.categoryId;
+      console.log(catId);
+    
+      let catName = String((await this.getImageCategoryName(catId)).data);
+      console.log(catName);
+      categories.push({categoryId: catId, name: catName});
+      console.log(categories);
+    }    
+    
+    return { data: categories, error: rows.error};    
+    }
+
 }
