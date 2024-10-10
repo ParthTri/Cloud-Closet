@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginTop: 20,
     alignItems: "stretch",
-    borderWidth: 2,
+    borderWidth: 1,
 	  flexDirection: "row",
     shadowColor: "#000",
     shadowOffset: {
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     marginTop: 20,
     alignItems: "center",
-    borderWidth: 2,
+    borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     alignItems: "center",
-    borderWidth: 2,
+    borderWidth: 1,
   },
   outfitImage: {
     width: 100,
