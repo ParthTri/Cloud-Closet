@@ -96,7 +96,7 @@ export class GenOutfitService {
       if (item['ImageCategory'].length > 1) {
         item['ImageCategory'].forEach((cat) => {
           const meta: string = cat['ItemCategory']['metaCategory'];
-          if (req.type == OutfitType.FORMAL) {
+          if (req.type == OutfitType.FORMAL || req.type == OutfitType.DRESSY) {
             if (!TOP && meta == 'TOP') {
               payload.push(item);
               TOP = true;
@@ -110,7 +110,10 @@ export class GenOutfitService {
               payload.push(item);
               JACKET = true;
             }
-          } else {
+          } else if (
+            req.type == OutfitType.CASUAL ||
+            req.type == OutfitType.DRESSY
+          ) {
             if (!TOP && meta == 'TOP') {
               payload.push(item);
               TOP = true;
