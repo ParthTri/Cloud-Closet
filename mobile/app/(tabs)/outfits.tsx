@@ -1,5 +1,5 @@
-import { View, Text, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet, TextInput } from "react-native";
-import { MaterialIcons, Entypo, Ionicons } from "@expo/vector-icons";
+import { View, Text, Button, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet } from "react-native";
+import { MaterialIcons, Entypo } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
 import { useAuth } from '../authContext';
 import axios from 'axios';
@@ -116,46 +116,14 @@ export default function Outfits() {
 	const [selectedBottoms, setSelectedBottoms] = useState<string | null>(null);
 	const [selectedShoes, setSelectedShoes] = useState<string | null>(null);
 	const [uploading, setUploading] = useState(false);
+	const [outfitName, setOutfitName] = useState<string>('');
+	const [savedOutfitName, setSavedOutfitName] = useState<string>('');
 
 	{/* Function to fetch outfit categories */}
 
-	// Upload Outfit function 
-	const uploadOutfit = async () => {
-		// Ensure that all required categories are selected (tops, bottoms, shoes)
-		if (!selectedTops || !selectedBottoms || !selectedShoes) {
-		Alert.alert('Error', 'Please select items for all categories: tops, bottoms, and shoes');
-		return;
-		}
-	
-		setUploading(true);
-	
-		try {
-			// Create an outfit object containing the selected items
-			const outfit = {
-				tops: selectedTops,          // Predefined tops selection
-				bottoms: selectedBottoms,    // Predefined bottoms selection
-				shoes: selectedShoes,        // Predefined shoes selection
-				userID: user?.userID,        // The user's ID from authentication context
-			};
-		
-			// Post the outfit to your server or API
-			await axios.post(SAVE_OUTFIT_API_URL, outfit, {
-				headers: { 'Content-Type': 'application/json' },
-			});
-		
-			// Display success message and reset selections
-			Alert.alert('Upload successful', 'Your outfit has been uploaded successfully.');
-			setSelectedTops(null);
-			setSelectedBottoms(null);
-			setSelectedShoes(null);
-		} catch (error) {
-			console.error('Upload error:', error);
-			Alert.alert('Upload failed', 'There was an error uploading your outfit.');
-		} finally {
-			setUploading(false);
-		}
-	};
-	
+	{/* Function to fetch save outfit with name and categories */}
+	// uploadOutfit 
+
 	useEffect(() => {
 		const fetchTopsImages = async () => {
 			const items = await getUserItems(userID, "tops"); // should be fine once upload function is added
@@ -177,7 +145,7 @@ export default function Outfits() {
 	  
 	const handleLeftPress = () => {
 		setCurrentIndex((prevIndex) =>
-			prevIndex === 0 ? topsImages.length - 1 : prevIndex - 1
+			prevIndex === 0 ? currentImages.length - 1 : prevIndex - 1
 		);
 	};
 
@@ -187,9 +155,11 @@ export default function Outfits() {
     );
   };
 
-	const saveOutfitWithCategories = async () => {
+	const saveOutfit = async () => {
 		//await uploadOutfit(); 
 		setSelectedCategories([]);
+		setSavedOutfitName(outfitName); 
+        setOutfitName(''); 
 	  };
 
 // Function to select a category
@@ -221,6 +191,7 @@ export default function Outfits() {
         <MaterialIcons name="swipe" size={30} color="black" />
       </View>
 
+			<ScrollView>
 			<ScrollView>
 				{/* Tops Slider */}
 				<Text style={styles.sliderTitleText}>Tops</Text>
@@ -360,9 +331,9 @@ export default function Outfits() {
 				onPressOut={() => setButtonPressed(false)} // When button is released
 				>
 					<Text style={styles.saveButtonText}>SAVE OUTFIT</Text>
-		</Pressable>
-		</ScrollView>
-	</View>
+				</Pressable>
+			</ScrollView>
+		</View>
 	);
 }
 
