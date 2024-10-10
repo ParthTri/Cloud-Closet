@@ -1,5 +1,5 @@
-import { View, Text, Button, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet } from "react-native";
-import { MaterialIcons, Entypo } from "@expo/vector-icons";
+import { View, Text, Button, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet, TextInput } from "react-native";
+import { MaterialIcons, Entypo, Ionicons } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
 import { useAuth } from '../authContext';
 import axios from 'axios';
@@ -53,7 +53,7 @@ export default function Outfits() {
 	const [categories, setCategories] = useState<Category[]>([]); // save category
 	const [topsImages, setTopsImages] = useState<any[]>([]);
 	const [bottomsImages, setBottomsImages] = useState<any[]>([]);
-	const [shoesImages, setShoesImages] = useState<any[]>([]);
+	const [footwearImages, setFootwearImages] = useState<any[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [outfitName, setOutfitName] = useState<string>('');
 	const [isEditable, setIsEditable] = useState(true);
@@ -117,30 +117,24 @@ export default function Outfits() {
 	const [selectedShoes, setSelectedShoes] = useState<string | null>(null);
 	const [uploading, setUploading] = useState(false);
 	const [outfitName, setOutfitName] = useState<string>('');
-	const [savedOutfitName, setSavedOutfitName] = useState<string>('');
+	const [isEditable, setIsEditable] = useState(true);
+	
+	const [currentImages, setCurrentImages] = useState(topsImages);
+
+	const searchForItem = async (search: string) => {
+		await getUserItems(userID, search).then((x) => {
+			setItems(x["data"]);
+		});
+	};
 
 	{/* Function to fetch outfit categories */}
 
-	{/* Function to fetch save outfit with name and categories */}
+	{/* Function to save outfit with name and categories */}
 	// uploadOutfit 
 
 	useEffect(() => {
-		const fetchTopsImages = async () => {
-			const items = await getUserItems(userID, "tops"); // should be fine once upload function is added
-			setTopsImages(items);
-		};
-		const fetchBottomsImages = async () => {
-			const items = await getUserItems(userID, "bottoms"); // should be fine once upload function is added
-			setBottomsImages(items);
-		};
-		const fetchShoesImages = async () => {
-			const items = await getUserItems(userID, "shoes"); // should be fine once upload function is added
-			setShoesImages(items);
-		};
+		getUserItems(userID, "").then((x) => setItems(x["data"]));
 		{/* fetch outfit categories here */}
-		fetchTopsImages();
-		fetchBottomsImages();
-		fetchShoesImages();
 	}, []);
 	  
 	const handleLeftPress = () => {
@@ -158,7 +152,7 @@ export default function Outfits() {
 	const saveOutfit = async () => {
 		//await uploadOutfit(); 
 		setSelectedCategories([]);
-		setSavedOutfitName(outfitName); 
+		// setOutfitName(outfitName); 
         setOutfitName(''); 
 	  };
 
@@ -429,32 +423,17 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 	},
 	textInputText: {
-		flex: 1, 
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center", 
-		color: "#000000",
-		backgroundColor: "#D0D0D0",
-		borderRadius: 5,
-		padding: 10, 
-		paddingHorizontal: 10,
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center", 
+        color: "#000000",
+        backgroundColor: "#D0D0D0",
+        borderRadius: 5,
+        padding: 10, 
+        paddingHorizontal: 10,
 		fontSize: 14, 
-		borderWidth: 1, 
-		borderColor: "#A0A0A0", 
-	  },
-	  outfitNameContainer: { 
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginTop: 10,
-	  },
-	  iconLabel: {
-		marginLeft: 5,                
-		fontSize: 12,                 
-		color: '#666',
-	  },
-	  iconContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingHorizontal: 8, 
-	  },
+        borderWidth: 1, 
+        borderColor: "#A0A0A0", 
+    },
 });
