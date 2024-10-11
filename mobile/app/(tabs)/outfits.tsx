@@ -1,4 +1,4 @@
-import { View, Text, Button, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet, TextInput, ActivityIndicator } from "react-native";
+import { View, Text, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet, TextInput } from "react-native";
 import { MaterialIcons, Entypo, Ionicons } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
 import { useAuth } from '../authContext';
@@ -14,6 +14,8 @@ interface Category {
   name: string;
   timestamp: string;
 }
+
+//const { width } = Dimensions.get("window");
 
 async function getUserItems(
   userID: string | undefined,
@@ -44,21 +46,20 @@ async function getUserItems(
 }
 
 export default function Outfits() {
-	const { user } = useAuth();
-	const userID: string | undefined = user?.userID;
-   
-	const [items, setItems] = useState<any[]>([]);
-	const [buttonPressed, setButtonPressed] = useState(false);
-	const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-	const [categories, setCategories] = useState<Category[]>([]); // save category
-	const [topsImages, setTopsImages] = useState<any[]>([]);
-	const [bottomsImages, setBottomsImages] = useState<any[]>([]);
-	const [footwearImages, setFootwearImages] = useState<any[]>([]);
-
-	const [currentIndex, setCurrentIndex] = useState(0);
-	const [outfitName, setOutfitName] = useState<string>('');
-	const [isEditable, setIsEditable] = useState(true);
-	const [currentImages, setCurrentImages] = useState<any[]>([]);
+  const { user } = useAuth();
+  const userID: string | undefined = user?.userID;
+ 
+  const [items, setItems] = useState<any[]>([]);
+  const [buttonPressed, setButtonPressed] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]); // save category
+  const [topsImages, setTopsImages] = useState<any[]>([]);
+  const [bottomsImages, setBottomsImages] = useState<any[]>([]);
+  const [footwearImages, setFootwearImages] = useState<any[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [outfitName, setOutfitName] = useState<string>('');
+  const [isEditable, setIsEditable] = useState(true);
+  const [currentImages, setCurrentImages] = useState<any[]>([]);
 
  // Loading category data status
   const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
@@ -113,36 +114,12 @@ export default function Outfits() {
     fetchOutfitCategories();
   }, []);
 
-	const [selectedTops, setSelectedTops] = useState<string | null>(null);
-	const [selectedBottoms, setSelectedBottoms] = useState<string | null>(null);
-	const [selectedShoes, setSelectedShoes] = useState<string | null>(null);
-	const [uploading, setUploading] = useState(false);
-	const [outfitName, setOutfitName] = useState<string>('');
-	const [isEditable, setIsEditable] = useState(true);
-	
-	const [currentImages, setCurrentImages] = useState(topsImages);
-	
-	const searchForItem = async (search: string) => {
-		await getUserItems(userID, search).then((x) => {
-			setItems(x["data"]);
-		});
-	};
 
-	{/* Function to fetch outfit categories */}
-
-	{/* Function to save outfit with name and categories */}
-	// uploadOutfit 
-
-	useEffect(() => {
-		getUserItems(userID, "").then((x) => setItems(x["data"]));
-		{/* fetch outfit categories here */}
-	}, []);
-	  
-	const handleLeftPress = () => {
-		setCurrentIndex((prevIndex) =>
-			prevIndex === 0 ? currentImages.length - 1 : prevIndex - 1
-		);
-	};
+  const handleLeftPress = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? currentImages.length - 1 : prevIndex - 1
+    );
+  };
 
   const handleRightPress = () => {
     setCurrentIndex((prevIndex) =>
@@ -150,12 +127,10 @@ export default function Outfits() {
     );
   };
 
-	const saveOutfit = async () => {
-		//await uploadOutfit(); 
-		setSelectedCategories([]);
-		// setOutfitName(outfitName); 
-        setOutfitName(''); 
-	  };
+  const saveOutfitWithCategories = async () => {
+	//await uploadImage();
+	setSelectedCategories([]);
+  };
 
 // Function to select a category
   const selectedCategory = (categoryID: number) => {
@@ -175,7 +150,7 @@ export default function Outfits() {
       const filteredItems = items.filter(item => selectedCategories.includes(item.categoryID));
       setCurrentImages(filteredItems);
     }
-  }, [selectedCategories, topsImages, bottomsImages, shoesImages, items]);
+  }, [selectedCategories, topsImages, bottomsImages, footwearImages, items]);
 
   return (
     <View style={styles.container}>
@@ -186,32 +161,30 @@ export default function Outfits() {
         <MaterialIcons name="swipe" size={30} color="black" />
       </View>
 
-			<ScrollView>
-			<ScrollView>
-				{/* Tops Slider */}
-				<Text style={styles.sliderTitleText}>Tops</Text>
-				<View style={styles.sliderContainer}>
-					
-					{/* Left Button */}
-					<Pressable onPress={handleLeftPress}>
-						<Entypo name="chevron-thin-left" size={50} color="#8ABAE3"/>
-					</Pressable>
+      <ScrollView>
+        {/* Tops Slider */}
+        <Text style={styles.sliderTitleText}>Tops</Text>
+        <View style={styles.sliderContainer}>
+          {/* Left Button */}
+          <Pressable onPress={handleLeftPress}>
+            <Entypo name="chevron-thin-left" size={50} color="#8ABAE3"/>
+          </Pressable>
 
-					{/* Getting Bottoms Images for Slider */}
-					{topsImages.length > 0 ? (
-					<Image
-						source={{ uri: topsImages[currentIndex]?.imageURL }} 
-						style={styles.sliderImage} 
-					/>
-					) : (
-					<Text>Loading 'Tops' Images...</Text>
-					)}
-					
-					{/* Right Button */}
-					<Pressable onPress={handleRightPress}>
-						<Entypo name="chevron-thin-right" size={50} color="#8ABAE3"/>
-					</Pressable>
-				</View>
+          {/* get Tops photos for slider */}
+          {topsImages.length > 0 ? (
+            <Image
+              source={{ uri: topsImages[currentIndex]?.imageURL }} 
+              style={styles.sliderImage} 
+            />
+          ) : (
+            <Text>Loading 'Tops' Images...</Text>
+          )}
+          
+          {/* Right Button */}
+          <Pressable onPress={handleRightPress}>
+            <Entypo name="chevron-thin-right" size={50} color="#8ABAE3"/>
+          </Pressable>
+        </View>
 
         {/* Bottoms Slider */}
         <Text style={styles.sliderTitleText}>Bottoms</Text>
@@ -246,9 +219,9 @@ export default function Outfits() {
           </Pressable>
           
           {/* Get the Footwear image for the slider */}
-          {shoesImages.length > 0 ? (
+          {footwearImages.length > 0 ? (
             <Image
-              source={{ uri: shoesImages[currentIndex]?.imageURL }} 
+              source={{ uri: footwearImages[currentIndex]?.imageURL }} 
               style={styles.sliderImage} 
             />
           ) : (
@@ -315,21 +288,21 @@ export default function Outfits() {
           </Pressable>
         </View>
 
-        {/* Save Match Button */}
-		<Pressable
-			style={[
-				styles.saveButton,
-				{ backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" }, // Change color based on state
-				]}
-				onPressIn={() => setButtonPressed(true)} // When button is pressed
-				onPress={saveOutfitWithCategories} // Save Outfit with Categories
-				onPressOut={() => setButtonPressed(false)} // When button is released
-				>
-					<Text style={styles.saveButtonText}>SAVE OUTFIT</Text>
-				</Pressable>
-			</ScrollView>
-		</View>
-	);
+        {/* Save Outfit Button */}
+        <Pressable
+          style={[
+            styles.saveButton,
+            { backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" }, //Change color according to status
+          ]}
+          onPressIn={() => setButtonPressed(true)} // When the button is pressed
+          onPress={saveOutfit} // Save Outfit
+          onPressOut={() => setButtonPressed(false)} // When the button is released
+        >
+          <Text style={styles.saveButtonText}>SAVE OUTFIT</Text>
+        </Pressable>
+      </ScrollView>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -395,8 +368,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
 	sliderImage: {
-		width: 150,
-		height: 150,
+		width: 100,
+		height: 100,
 		borderRadius: 8,
 	},
 	sliderContainer: {
@@ -424,17 +397,32 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 	},
 	textInputText: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center", 
-        color: "#000000",
-        backgroundColor: "#D0D0D0",
-        borderRadius: 5,
-        padding: 10, 
-        paddingHorizontal: 10,
+		flex: 1, 
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center", 
+		color: "#000000",
+		backgroundColor: "#D0D0D0",
+		borderRadius: 5,
+		padding: 10, 
+		paddingHorizontal: 10,
 		fontSize: 14, 
-        borderWidth: 1, 
-        borderColor: "#A0A0A0", 
-    },
+		borderWidth: 1, 
+		borderColor: "#A0A0A0", 
+	  },
+	  outfitNameContainer: { 
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginTop: 10,
+	  },
+	  iconLabel: {
+		marginLeft: 5,                
+		fontSize: 12,                 
+		color: '#666',
+	  },
+	  iconContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: 8, 
+	  },
 });
