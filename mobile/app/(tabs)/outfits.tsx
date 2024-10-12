@@ -52,7 +52,8 @@ export default function Outfits() {
   const [items, setItems] = useState<any[]>([]);
   const [buttonPressed, setButtonPressed] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]); // save category
+ // const [categories, setCategories] = useState<Category[]>([]); // save category
+  const [categories, setCategories] = useState([]);
   const [topsImages, setTopsImages] = useState<any[]>([]);
   const [bottomsImages, setBottomsImages] = useState<any[]>([]);
   const [footwearImages, setFootwearImages] = useState<any[]>([]);
@@ -62,30 +63,29 @@ export default function Outfits() {
   const [currentImages, setCurrentImages] = useState<any[]>([]);
 
  // Loading category data status
-  const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-
-  const searchForItem = async (search: string) => {
-    const filter = selectedCategories.join(','); 
-    await getUserItems(userID, filter).then((x) => {
-      setItems(x);
-    });
-  };
-
-  // Function to get clothing category
-  const fetchOutfitCategories = async () => {
-    try {
-      const response = await axios.get(OUTFIT_CATEGORIES_API_URL);
-      if (Array.isArray(response.data.data)) {
-        setCategories(response.data.data);
-        setIsLoadingCategories(false);
-      } else {
-        console.error('Unexpected response format:', response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
+ const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
+ const [fetchError, setFetchError] = useState<string | null>(null);
+ 
+ const searchForItem = async (search: string) => {
+   const filter = selectedCategories.join(','); 
+   await getUserItems(userID, filter).then((x) => {
+	 setItems(x);
+   });
+ };
+ // Function to get clothing category
+ const fetchOutfitCategories = async () => {
+   try {
+	 const response = await axios.get(OUTFIT_CATEGORIES_API_URL);
+	 if (Array.isArray(response.data.data)) {
+	   setCategories(response.data.data);
+	   setIsLoadingCategories(false);
+	 } else {
+	   console.error('Unexpected response format:', response.data);
+	 }
+   } catch (error) {
+	 console.error('Error fetching categories:', error);
+   }
+ };
 
   const saveOutfit = async () => {
     try {
@@ -110,7 +110,7 @@ export default function Outfits() {
 
 
   useEffect(() => {
-    // getUserItems(userID, "").then((x) => setItems(x));
+    getUserItems(userID, "").then((x) => setItems(x));
     fetchOutfitCategories();
   }, []);
 
@@ -233,7 +233,7 @@ export default function Outfits() {
             <Entypo name="chevron-thin-right" size={50} color="#8ABAE3"/>
           </Pressable>
         </View>
-        
+
         {/* Category selection */}
         <Text style={styles.selectCategoryTitleText}>Select categories:</Text>
         {isLoadingCategories ? (
@@ -262,7 +262,7 @@ export default function Outfits() {
                 ))}
           </View>
 		</ScrollView>
-        )}
+        )} 
 
         {/* Outfit Name Input */}
         <Text style={styles.outfitNameText}>Outfit Name:</Text>
