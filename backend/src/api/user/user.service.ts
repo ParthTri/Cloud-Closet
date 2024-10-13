@@ -56,9 +56,9 @@ export class UserService {
       if (!token.error) {
         return {
           data: {
-            id: token.data.user.id,
+            userId: token.data.user.id,
             email: token.data.user.email,
-            access_token: token.data.session.access_token,
+            accessToken: token.data.session.access_token,
           },
           error: null,
         };
