@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { SupabaseProvider } from '../../supabase/supabase.service';
 import { CategoryDTO } from './interfaces/category.dto';
 
 @Injectable()

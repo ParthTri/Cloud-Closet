@@ -1,4 +1,5 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { SupabaseProvider } from '../../supabase/supabase.service';
 import { v1 as uuidv1 } from 'uuid';
 import { removeBackground } from '@imgly/background-removal-node';
 import { FileUploadDTO, FileUploadErrorDTO } from './interface/fileUpload.dto';

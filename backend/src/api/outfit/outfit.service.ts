@@ -1,4 +1,5 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { SupabaseProvider } from '../../supabase/supabase.service';
 import { Outfit } from './interfaces/outfit.dto';
 import { ImageService } from '../image/image.service';
 import { OutfitCategoryService } from '../outfitCategory/outfitCategory.service';
