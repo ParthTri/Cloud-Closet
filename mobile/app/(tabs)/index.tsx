@@ -22,16 +22,48 @@ export default function HomePage() {
   const [buttonPressed, setButtonPressed] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [isCategorySelectionVisible, setIsCategorySelectionVisible] = useState(false);
+  const [isCategorySelectionVisible, setIsCategorySelectionVisible] =
+    useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
 
   //weather API
   const API_Weather = "https://cloudcloset.kolide.co.nz/api/weather";
-  const OUTFIT_CATEGORIES_API_URL = 'http://cloudcloset.kolide.co.nz/api/outfitCategory/allMethod';
-  
+  const OUTFIT_CATEGORIES_API_URL =
+    "http://cloudcloset.kolide.co.nz/api/outfitCategory/allMethod";
+  const API_Generate = "https://cloudcloset.kolide.co.nz/api/genOutfit";
+
+  const fetchGenerate = async (
+    userId: string,
+    longitude: number,
+    latitude: number,
+    type: number
+  ) => {
+    try {
+      const response = await axios.post(API_Generate, {
+        userId,
+        longitude,
+        latitude,
+        type,
+      });
+
+      if (response.data) {
+        console.log("Generated outfit data:", response.data);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Axios error:",
+          error.response ? error.response.data : error.message
+        );
+      } else {
+        console.error("Error:", error);
+      }
+    }
+  };
 
   const [weatherData, setWeatherData] = useState({
     weather: "Loading...",
@@ -50,10 +82,8 @@ export default function HomePage() {
       const response = await axios.post(API_Weather, {
         latitude,
         longitude,
-    });
-
-      //console.log("Weather data response:", response.data); 
-
+      });
+      //console.log("Weather data response:", response.data);
       const { data, error } = response.data;
 
       if (error) {
@@ -67,7 +97,10 @@ export default function HomePage() {
       });
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        console.error("Axios error:", error.response ? error.response.data : error.message);
+        console.error(
+          "Axios error:",
+          error.response ? error.response.data : error.message
+        );
       } else if (error instanceof Error) {
         console.error("Error:", error.message);
       } else {
@@ -83,67 +116,70 @@ export default function HomePage() {
     }
   };
 
-    // updated uploadImage, selectedCategory, saveImageWithCategories, fetchOutfitCategories & useEffect
-    const uploadImage = async () => {
-      if (!selectedImage || selectedCategories.length === 0) {
-          Alert.alert('Error', 'Please select at least one category');
-          return;
-      }
-      setUploading(true);
-    };
-  
-    const selectedCategory = (categoryID: number) => {
-      if (selectedCategories.includes(categoryID)) {
-        setSelectedCategories(selectedCategories.filter((id) => id !== categoryID));
+  // updated uploadImage, selectedCategory,
+  // saveImageWithCategories, fetchOutfitCategories & useEffect
+  const uploadImage = async () => {
+    if (!selectedImage || selectedCategories.length === 0) {
+      Alert.alert("Error", "Please select at least one category");
+      return;
+    }
+    setUploading(true);
+  };
+
+  const selectedCategory = (categoryID: number) => {
+    if (selectedCategories.includes(categoryID)) {
+      setSelectedCategories(
+        selectedCategories.filter((id) => id !== categoryID)
+      );
+    } else {
+      setSelectedCategories([...selectedCategories, categoryID]);
+    }
+  };
+
+  const saveImageWithCategories = async () => {
+    await uploadImage();
+    setSelectedCategories([]);
+    setIsModalVisible(false);
+  };
+
+  const fetchOutfitCategories = async () => {
+    try {
+      const response = await axios.get(OUTFIT_CATEGORIES_API_URL);
+      if (Array.isArray(response.data.data)) {
+        setCategories(response.data.data);
       } else {
-        setSelectedCategories([...selectedCategories, categoryID]);
+        console.error("Unexpected response format:", response.data);
       }
-    };
-  
-    const saveImageWithCategories = async () => {
-      await uploadImage();
-      setSelectedCategories([]);
-      setIsModalVisible(false);
-    };
-  
-    const fetchOutfitCategories = async () => {
-      try {
-        const response = await axios.get(OUTFIT_CATEGORIES_API_URL);
-        if (Array.isArray(response.data.data)) {
-          setCategories(response.data.data);
-        } else {
-          console.error('Unexpected response format:', response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching outfit categories:', error);
-      }
-    };
+    } catch (error) {
+      console.error("Error fetching outfit categories:", error);
+    }
+  };
 
   useEffect(() => {
-    const latitude = -36.848461; 
-    const longitude = 174.763336; 
-    fetchWeatherData(latitude,longitude);
+    const latitude = -36.848461;
+    const longitude = 174.763336;
+    fetchWeatherData(latitude, longitude);
     fetchOutfitCategories();
   }, []);
-
 
   interface WeatherProps {
     weather: string;
     temperature: number | null;
   }
-  
+
   const Weather: React.FC<WeatherProps> = ({ weather, temperature }) => {
     const weatherImages: { [key: string]: any } = {
-      Clear: require('../../assets/weather/sun.png'),
-      Clouds: require('../../assets/weather/cloudy.png'),
-      Rain: require('../../assets/weather/rainy-1.png'),
-      Thunderstorm: require('../../assets/weather/storm-1.png'),
-      Drizzle: require('../../assets/weather/rainy.png'),
-      Atmosphere: require('../../assets/weather/foog.png'),
+      Clear: require("../../assets/weather/sun.png"),
+      Clouds: require("../../assets/weather/cloudy.png"),
+      Rain: require("../../assets/weather/rainy-1.png"),
+      Thunderstorm: require("../../assets/weather/storm-1.png"),
+      Drizzle: require("../../assets/weather/rainy.png"),
+      Atmosphere: require("../../assets/weather/foog.png"),
     };
-  
-    const weatherImage = weatherImages[weather] || require('../../assets/weather/night.png'); // Default image - need to find one
-  
+
+    const weatherImage =
+      weatherImages[weather] || require("../../assets/weather/night.png"); // Default image - need to find one
+
     return (
       <View style={styles.weatherContainer}>
         <View style={styles.weatherInfo}>
@@ -151,15 +187,19 @@ export default function HomePage() {
           <View style={styles.weatherTextContainer}>
             <Text style={styles.weatherDate}>Today</Text>
             <Text style={styles.weatherTemp}>
-              {weatherData.temperature !== null ? `${weatherData.temperature}°C` : "N/A"}
+              {weatherData.temperature !== null
+                ? `${weatherData.temperature}°C`
+                : "N/A"}
             </Text>
-            <Text style={styles.weatherLocation}>{weatherData.location || "Unknown Location"}</Text>
+            <Text style={styles.weatherLocation}>
+              {weatherData.location || "Unknown Location"}
+            </Text>
           </View>
         </View>
       </View>
     );
   };
- 
+
   // test - need to replace??? with actual notifs
   const notifications = [
     { id: 1, message: "New outfit suggestion available!" },
@@ -208,12 +248,15 @@ export default function HomePage() {
         </View>
       </Modal>
 
-        {/* Weather Info - added most of the design to the return statement*/}
-        {loading ? (
-          <Text>Loading weather data...</Text>
-        ) : (
-            <Weather weather={weatherData.weather} temperature={weatherData.temperature} />
-        )}
+      {/* Weather Info - added most of the design to the return statement*/}
+      {loading ? (
+        <Text>Loading weather data...</Text>
+      ) : (
+        <Weather
+          weather={weatherData.weather}
+          temperature={weatherData.temperature}
+        />
+      )}
 
       {/* Generate Outfit Button */}
       <Pressable
@@ -221,53 +264,83 @@ export default function HomePage() {
           styles.generateButton,
           { backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" }, // Change color based on state
         ]}
-        onPressIn={() => setButtonPressed(true)}  
-        onPress={() => {
-          setIsModalVisible(true);                
-          setButtonPressed(false);                 
+        onPressIn={() => setButtonPressed(true)}
+        onPress={async () => {
+          try {
+            // Call the generate outfit API when the button is pressed
+            //const generatedOutfit = await fetchGenerate();
+            //setGeneratedImage(generatedOutfit.imageUrl); // Set the image URL or other result you need
+            setIsModalVisible(true); // Open the modal after generating the outfit
+          } catch (error) {
+            console.error("Error generating outfit:", error);
+          } finally {
+            setButtonPressed(false); // Reset button state
+          }
         }}
-        onPressOut={() => setButtonPressed(false)} 
+        onPressOut={() => setButtonPressed(false)}
       >
         <Text style={styles.generateButtonText}>GENERATE OUTFIT</Text>
       </Pressable>
 
-      {/* Generate Outfit Modal */}
-      <Modal visible={isModalVisible} transparent={true} animationType="slide" onRequestClose={() => setIsModalVisible(false)}>
+      {/* Generated outfit image */}
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-          {!isCategorySelectionVisible ? (
-            <>
-              <Text style={styles.modalTitle}>Generated Outfit:</Text>
-              {/*generatedImage && <Image source={{ uri: generatedImage }} style={styles.generatedImage} />*/}
-              <Text style={styles.modalText}>Would you like to save this outfit?</Text>
-              <View style={styles.modalButton}>
-                <Button title="Yes" onPress={() => setIsCategorySelectionVisible(true)} />
-                <Button title="No" onPress={() => setIsModalVisible(false)} />
-              </View>
-              </> 
-              ) : (
-                <>
+            {!isCategorySelectionVisible ? (
+              <>
+                <Text style={styles.modalTitle}>Generated Outfit:</Text>
+                {generatedImage && (
+                  <Image
+                    source={{ uri: generatedImage }}
+                    style={styles.generatedImage}
+                  />
+                )}
+                <Text style={styles.modalText}>
+                  Would you like to save this outfit?
+                </Text>
+                <View style={styles.modalButton}>
+                  <Button
+                    title="Yes"
+                    onPress={() => setIsCategorySelectionVisible(true)}
+                  />
+                  <Button title="No" onPress={() => setIsModalVisible(false)} />
+                </View>
+              </>
+            ) : (
+              <>
                 <Text style={styles.modalText}>Select categories:</Text>
-                <ScrollView style={styles.categoriesContainer} horizontal={true}>
-                {categories.map((category) => (
-                  <Pressable
-                    key={category.categoryID}
-                    onPress={() => selectedCategory(category.categoryID)}
-                    style={[
-                      styles.categoryButton,
-                      selectedCategories.includes(category.categoryID) && styles.selectedCategory,
-                    ]}
-                  >
-                    <Text style={styles.categoryText}>{category.name}</Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
-              <View style={styles.modalButton}>
-                <Button title="Save" onPress={saveImageWithCategories} />
-                <Button title="Cancel" onPress={() => setIsModalVisible(false)} />
-			  </View>
-            </>
-          )}
+                <ScrollView
+                  style={styles.categoriesContainer}
+                  horizontal={true}
+                >
+                  {categories.map((category) => (
+                    <Pressable
+                      key={category.categoryID}
+                      onPress={() => selectedCategory(category.categoryID)}
+                      style={[
+                        styles.categoryButton,
+                        selectedCategories.includes(category.categoryID) &&
+                          styles.selectedCategory,
+                      ]}
+                    >
+                      <Text style={styles.categoryText}>{category.name}</Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+                <View style={styles.modalButton}>
+                  <Button title="Save" onPress={saveImageWithCategories} />
+                  <Button
+                    title="Cancel"
+                    onPress={() => setIsModalVisible(false)}
+                  />
+                </View>
+              </>
+            )}
           </View>
         </View>
       </Modal>
@@ -365,7 +438,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignItems: "stretch",
     borderWidth: 1,
-	  flexDirection: "row",
+    flexDirection: "row",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -470,29 +543,36 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   modalButton: {
-		flexDirection: 'row',
-		justifyContent: 'space-around',
-		width: '60%',
-		borderRadius: 10,
-		backgroundColor: '#ffffff',
-	},
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "60%",
+    borderRadius: 10,
+    backgroundColor: "#ffffff",
+  },
   categoriesContainer: {
-		maxHeight: 60,
-        flexDirection: 'row',
-    },
-    categoryButton: {
-        backgroundColor: '#eee',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        margin: 5,
-        borderRadius: 10,
-		    maxHeight: 40,
-    },
-    selectedCategory: {
-        backgroundColor: '#007AFF', 
-    },
-    categoryText: {
-        color: '#000',
-        fontSize: 16,
-    },
+    maxHeight: 60,
+    flexDirection: "row",
+  },
+  categoryButton: {
+    backgroundColor: "#eee",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    margin: 5,
+    borderRadius: 10,
+    maxHeight: 40,
+  },
+  selectedCategory: {
+    backgroundColor: "#007AFF",
+  },
+  categoryText: {
+    color: "#000",
+    fontSize: 16,
+  },
+  generatedImage: {
+    width: 200,
+    height: 300,
+    resizeMode: "contain",
+    marginVertical: 20,
+    borderRadius: 10,
+  },
 });
