@@ -100,7 +100,7 @@ export default function Outfits() {
         setSelectedCategories([]);
         setOutfitName('');
       } else {
-        Alert.alert('Error', 'Failed to save outfit.');
+        Alert.alert('Sorry, there was an issue.', 'Outfit could not be saved.');
       }
     } catch (error) {
       console.error('Error saving outfit:', error);
