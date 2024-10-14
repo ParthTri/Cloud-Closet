@@ -1,10 +1,11 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { SupabaseProvider } from 'src/supabase/supabase.service';
+import { SupabaseProvider } from '../../supabase/supabase.service';
 import { Outfit } from './interfaces/outfit.dto';
 import { ImageService } from '../image/image.service';
 import { OutfitCategoryService } from '../outfitCategory/outfitCategory.service';
 import { console } from 'inspector';
 import { ImageDTO } from '../image/interface/image.dto';
+import { error } from 'console';
 
 @Injectable()
 export class OutfitService {
@@ -52,19 +53,17 @@ let outfitId = insertData[0].outfitId;
   // Insert to OutfitsCategory table
   // Get all category Ids
   let allCategoryIds = joincategoryIdsString.split(',');
-  for(const categoryId of allCategoryIds)
-  {
-    //Insert into OutfitsCategory
-    const { error: categoryError } = await this.supa.getClient()
-        .from('OutfitsCategory')
-        .insert({
-          outfitId: outfitId,
-          categoryId: categoryId,
-        });
 
-      if (categoryError) {
-        return { data: null, error: categoryError};
-      }
+  for(const cat of allCategoryIds)
+  {
+    let categoryId = Number(cat);
+    //Insert into OutfitsCategory
+    const addOutfitsCategory = await this.outfitCategoryService.AddANewCategoryIntoAnOutfit(outfitId, categoryId);
+
+    if (addOutfitsCategory.error)
+    {
+      return {data: null, error: addOutfitsCategory.error};
+    }
   }
 
   console.log("inserted to OutfitsCategory table");

@@ -10,8 +10,8 @@ import { Logo } from '@/components/Logo';
 import { Link, router } from 'expo-router';
 import { usePermissions } from 'expo-media-library';
 
-const API_URL = 'http://cloudcloset.kolide.co.nz/api/image';
-const CATEGORIES_API_URL = 'http://cloudcloset.kolide.co.nz/api/categories';
+const API_URL = 'http://192.168.1.21:8081/api/image';
+const CATEGORIES_API_URL = 'http://192.168.1.21:8081/api/categories';
 
 interface Category {
   categoryID: number;
@@ -62,7 +62,7 @@ export default function Upload() {
 			
 			let photo =  await cameraRef.current.takePictureAsync(options);
 
-		if (photo.uri) {
+		if (photo && photo.uri) {
 			setSelectedImage(photo.uri);
 			setIsModalVisible(true);
 		} else {
@@ -88,7 +88,10 @@ export default function Upload() {
       if (selectedImage.startsWith('data:')) {
         const mimeType = selectedImage.split(';')[0].split(':')[1];
         filename = `image.${getFileExtensionFromMimeType(mimeType)}`;
-        base64Image = selectedImage;
+        // Get base64 
+        //base64Image = selectedImage;
+        const commaIndex = selectedImage.indexOf(',');
+        base64Image = selectedImage.substring(commaIndex + 1);
       } else if (selectedImage.startsWith('file://')) {
         const cleanUri = selectedImage.replace(/^file:\/\//, '');
         filename = cleanUri.split('/').pop();
@@ -100,7 +103,10 @@ export default function Upload() {
         const base64 = await FileSystem.readAsStringAsync(cleanUri, {
           encoding: FileSystem.EncodingType.Base64,
         });
-        base64Image = `data:${mimeType};base64,${base64}`;
+        // Get base64 
+        //base64Image = `data:${mimeType};base64,${base64}`;
+        base64Image = base64;
+
       } else {
         throw new Error('Unsupported URI format');
       }
