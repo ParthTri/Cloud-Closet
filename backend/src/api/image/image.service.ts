@@ -1,5 +1,4 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { SupabaseProvider } from 'src/supabase/supabase.service';
 import { v1 as uuidv1 } from 'uuid';
 import { removeBackground } from '@imgly/background-removal-node';
 import { FileUploadDTO, FileUploadErrorDTO } from './interface/fileUpload.dto';
@@ -167,6 +166,12 @@ export class ImageService {
   }
 
   async getImagesByUserId(userId: string): Promise<{data, error}> {
+
+    // Check userId is null
+    if (!userId)
+    {
+      return {data: null, error: "Invalid userId"};
+    }
     const rows = await this.supa
       .getClient()
       .from('Image')
@@ -264,34 +269,49 @@ export class ImageService {
     };
   }
 
-    async searchImageByKeyWord(keyword: string, userId): Promise<{data, error}> {
-        let searchResult = new Array<ImageDTO>();
+    async searchImageByKeyWord(keyword: string, userId: string): Promise<{data, error}> {
+      //Check userId is null
+      if (!userId)
+      {
+        return {data: null, error: "Invalid userId"};
+      }
 
-        let queryImagesResult = await this.getImagesByUserId(userId);
+      
+      let searchResult = new Array<ImageDTO>();
 
-        if (!queryImagesResult.data)
-        {
+      // Get all clothing items of the user   
+      let queryImagesResult = await this.getImagesByUserId(userId);
+
+      // Check if the database query gets error
+      if (!queryImagesResult.data){
           return {data: null, error: queryImagesResult.error };
-        }  
+      }
 
-        const allUserimages = queryImagesResult.data;
+      const allUserimages = queryImagesResult.data;
 
-        for (const image of allUserimages) {
-          // Check if any category name matches the keyword
-          let hasKeyword = false;
-          for (const cat of image.categories) {
-            if (cat.name.toLocaleLowerCase().includes(keyword.toLowerCase())) {
+      // Check if keyword = null
+      if (keyword == null) {
+        return { data: allUserimages, error: null };
+      }
+
+      for (const image of allUserimages) {
+        // Check if any category name matches the keyword
+        let hasKeyword = false;
+        for (const cat of image.categories) {
+          if (cat.name.toLowerCase().includes(keyword.toLowerCase())) {
               hasKeyword = true;
               break;
-            }
+          }
           }
           if (hasKeyword) {
             searchResult.push(image);
           }
         }
+        
         return {data: searchResult, error: null};
       
     }
+}
 
   //   async filterImageByCategory(
   //     categories: Array<number>,
@@ -322,6 +342,6 @@ export class ImageService {
   //     }
   //     return filterResult;
   //   }
-}
+
 
 
