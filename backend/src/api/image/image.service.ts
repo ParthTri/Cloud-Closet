@@ -27,7 +27,7 @@ export class ImageService {
     console.log(fileName);
     console.log(categories);
     console.log(userId);
-    
+
     const responseData: FileUploadDTO = {
       rawData: {
         id: '',
@@ -120,48 +120,28 @@ export class ImageService {
     responseData.imageId = insertData[0].imageId;
 
     // Insert Category data in to ImageCategory
-    // categories.forEach(async (name) => {
-    //   // Get the category id from the name
-    //   const { data, error } = await client
-    //     .from('ItemCategory')
-    //     .select('id')
-    //     .eq('name', name.toLowerCase());
+    categories.split(',').forEach(async (name) => {
+      // Get the category id from the name
+      const { data, error } = await client
+        .from('ItemCategory')
+        .select('id')
+        .eq('name', name.toLowerCase());
 
-    //   if (error) {
-    //     return;
-    //   }
+      if (error || !data[0]) {
+        return;
+      }
 
-    //   const { error: categoryError } = await client
-    //     .from('ImageCategory')
-    //     .insert({
-    //       imageId: insertData[0].imageId,
-    //       categoryId: data[0].id,
-    //     });
-
-    //   if (categoryError) {
-    //     return;
-    //   }
-    // });
-
-    // Insert Category data in to ImageCategory
-     // Convert the comma-separated list of categories into an array of numbers
-     const categoriesArray = categories.split(',').map((category) => Number(category));
-    // Insert to ImageCategory database
-     for(const element of categoriesArray)
-     {
       const { error: categoryError } = await client
         .from('ImageCategory')
         .insert({
           imageId: insertData[0].imageId,
-          categoryId: element,
+          categoryId: data[0].id,
         });
 
       if (categoryError) {
         return;
       }
-
-     }
-
+    });
 
     return responseData;
   }
@@ -182,25 +162,25 @@ export class ImageService {
       return { data: null, error: rows.error };
     }
 
-    let images = Array <ImageDTO>();
+    let images = Array<ImageDTO>();
 
-    for (const image of rows.data)
-    {
-      const categories = (await this.categoryService.getImageCategoriesByImageId(image.imageId)).data;
+    for (const image of rows.data) {
+      const categories = (
+        await this.categoryService.getImageCategoriesByImageId(image.imageId)
+      ).data;
       images.push({
         imageId: image.imageId,
         created_at: image.created_at,
         rawUrl: image.rawUrl,
         processedUrl: image.processedUrl,
         userId: image.userId,
-        categories: categories
+        categories: categories,
       });
     }
     return { data: images, error: rows.error };
   }
 
-  async getImageInfoByImageId(imageId: string): Promise<{data, error}> {
-
+  async getImageInfoByImageId(imageId: string): Promise<{ data; error }> {
     const row = await this.supa
       .getClient()
       .from('Image')
@@ -211,32 +191,34 @@ export class ImageService {
     }
 
     //Get image categories
-    const imageCategories = (await this.categoryService.getImageCategoriesByImageId(imageId)).data;
-    
+    const imageCategories = (
+      await this.categoryService.getImageCategoriesByImageId(imageId)
+    ).data;
+
     const image: ImageDTO = {
       imageId: row.data[0].imageId,
       created_at: row.data[0].created_at,
       rawUrl: row.data[0].rawUrl,
       processedUrl: row.data[0].processedUrl,
       userId: row.data[0].userId,
-      categories: imageCategories
+      categories: imageCategories,
     };
 
-    return { data: image, error: row.error};
+    return { data: image, error: row.error };
   }
 
   async deleteUserImage(imageId: string): Promise<any> {
     // Delete outfit which contains imageId
     // Find outfit contains imageId
-    const outfitRows = (await this.outfitService.getAllOutfitIdsbyImageId(imageId)).data;
-    if (outfitRows)
-    {
-      for (const outfitId of outfitRows)
-      {
+    const outfitRows = (
+      await this.outfitService.getAllOutfitIdsbyImageId(imageId)
+    ).data;
+    if (outfitRows) {
+      for (const outfitId of outfitRows) {
         await this.outfitService.deleteOutfit(outfitId);
       }
     }
-    
+
     //Delete categoryImage
     const categoryDelete = await this.supa
       .getClient()
@@ -313,6 +295,7 @@ export class ImageService {
       
     }
 }
+
 
   //   async filterImageByCategory(
   //     categories: Array<number>,

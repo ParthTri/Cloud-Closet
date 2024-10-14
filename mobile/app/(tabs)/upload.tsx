@@ -168,8 +168,8 @@ export default function Upload() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.headerContainer}>
-        <Logo logoWidth={80} logoHeight={80} />
-        <Text style={styles.header}>Upload</Text>
+        <Logo logoWidth={30} logoHeight={30} />
+        <Text style={styles.header}>CLOUD CLOSET</Text>
         <Link href="/(tabs)" style={styles.closeButton} asChild>
           <AntDesign name="closecircleo" size={30} color="black" />
         </Link>
@@ -238,18 +238,21 @@ export default function Upload() {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1, 
-		backgroundColor: "white"
+		flex: 1,
+		padding: 20,
+		backgroundColor: "#FFFFFF",
+		paddingTop: 55,
 	},
 	headerContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
+		flexDirection: "row",
+		alignItems: "center",
 		paddingVertical: 20,
 	},
 	header: {
-		padding: 20, // space from the top
-		fontSize: 32,
+		fontSize: 24,
 		fontWeight: "bold",
+    paddingLeft: 30,
+    alignSelf: "center",
 	},
 	closeButton: {
 	    position: "absolute",

@@ -1,0 +1,19 @@
+meta {
+  name: Generate Outfit
+  type: http
+  seq: 15
+}
+
+get {
+  url: http://localhost:3000/api/genOutfit
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "1ecdfc12-a195-4d6c-ad36-60893871e682",
+    "latitude": -36.8485,
+    "longitude": 174.7635 
+  }
+}
