@@ -2,9 +2,9 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 // Define the shape of the user data
 interface User {
-  userID: string;
-  userName: string;
+  userId: string;
   email: string;
+  accessToken: string;
 }
 
 // Define the shape of the context value
@@ -21,8 +21,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = (userData: User) => {
-    setUser(userData);
+    const login = (userData: {data: User}) => {
+    console.log(userData.data)
+    setUser(userData["data"]);
+    console.log(user)
   };
 
   const logout = () => {

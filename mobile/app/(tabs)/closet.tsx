@@ -7,9 +7,8 @@ import {
 	FlatList,
 	TextInput,
 	Pressable,
-	Alert,
 } from "react-native";
-import { useAuth } from "../authContext";
+import { getUser  } from "../lib/auth.ts";
 import { Logo } from "@/components/Logo";
 import Feather from "@expo/vector-icons/Feather";
 
@@ -23,7 +22,7 @@ async function getUserItems(
 	let data;
 	console.log(filter.length);
 	if (filter.length == 0) {
-		data = await fetch(`http://cloudcloset.kolide.co.nz/api/image/${userID}`, {
+		data = await fetch(`https://cloudcloset.kolide.co.nz/api/image/${userID}`, {
 			method: "GET",
 			headers: {
 				Accept: "application/json",
@@ -48,8 +47,8 @@ async function getUserItems(
 }
 export default function Closet() {
 	const [search, setSearch] = useState<string>("");
-	const { user } = useAuth();
-	const userID: string | undefined = user?.userID;
+  	const user = getUser();
+	const userID: string | undefined = user?.userId;
 	const [items, setItems] = useState<any[]>([{}]);
 
 	const searchForItem = async (search: string) => {
