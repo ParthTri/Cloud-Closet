@@ -17,6 +17,7 @@ export class GenOutfitDTO {
 export enum OutfitType {
   FORMAL,
   CASUAL,
+  DRESSY,
 }
 
 export const OutfitTypeName = {

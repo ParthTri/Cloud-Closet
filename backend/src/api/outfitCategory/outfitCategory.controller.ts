@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Delete, Param } from '@nestjs/common';
+import { Controller, Get, Param, Post, Delete, Body } from '@nestjs/common';
 import { OutfitCategoryService } from './outfitCategory.service';
 
 @Controller('api/outfitCategory')
@@ -18,5 +18,20 @@ export class OutfitCategoryController {
   @Get('/categoryName/:categoryId')
   async getCategoryNameByCategoryId(@Param('categoryId') categoryId: number): Promise<{data, error}> {
     return await this.outfitCategoryService.getOutfitCategoryName(categoryId);
+  }
+
+  @Delete('/deleteACategoryInOutfit')
+  async deleteACategoryInOutfit(
+    @Body('outfitId') outfitId: string,
+    @Body('outfitCategoryId') outfitCategoryId: number): Promise<any> {
+      console.log("CALLING DELETE");
+    return await this.outfitCategoryService.deleteACategoryInOutfit(outfitId, outfitCategoryId);
+  }
+
+  @Post('/AddOutfitCategory')
+  async insertANewCategoryIntoAnOutfit(
+    @Body('outfitId') outfitId: string,
+    @Body('insertOutfitCategoryId') insertOutfitCategoryId: number): Promise<{data, error}> {    
+    return await this.outfitCategoryService.AddANewCategoryIntoAnOutfit(outfitId, insertOutfitCategoryId);
   }
 }

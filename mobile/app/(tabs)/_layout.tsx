@@ -9,16 +9,16 @@ export default function TabLayout() {
 		<Tabs
 			screenOptions={{
 				tabBarActiveTintColor: "#8ABAE3",
-				tabBarInactiveTintColor: "gray",
+				tabBarInactiveTintColor: "#8e8e93",
 				tabBarStyle: {
 					backgroundColor: "white",
 					borderTopWidth: 0,
-					height: 65,
+					height: 70,
 					paddingBottom: 10,
-					elevation: 10,
+					elevation: 12,
 					shadowColor: "#000",
 					shadowOffset: { width: 0, height: 3 },
-					shadowOpacity: 0.1,
+					shadowOpacity: 0.15,
 					shadowRadius: 4,
 				},
 				tabBarLabelStyle: {

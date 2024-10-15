@@ -1,21 +1,14 @@
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Link, router } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 
 import ErrorText from "@/components/ErrorText";
 
 import React, { useState } from "react";
-import { useAuth } from "../authContext";
-
-async function save(key: string, value: string) {
-	await SecureStore.setItemAsync(key, value);
-}
+import { loginUser } from "../lib/auth.ts"
 
 
 export default function SignIn() {
-	const { login } = useAuth(); // Get login function from AuthContext
-
 	const [pressed, setPressed] = useState(false);
 	const [forgotPressed, setForgotPressed] = useState(false);
 	const [signUpPressed, setSignUpPressed] = useState(false);
@@ -47,7 +40,7 @@ export default function SignIn() {
 			if (json) {
 				// Assuming json.user contains user data
 				setShowError(false);
-				login(json); // Update AuthContext with logged-in user data
+				loginUser(json.data)
 				router.push("../(tabs)");
 			} else {
 				setShowError(true);
