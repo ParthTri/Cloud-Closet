@@ -17,8 +17,11 @@ import axios from "axios";
 import { getUser } from "../lib/auth";
 
 export default function HomePage() {
-  const { user } = useAuth(); // Get user data from AuthContext
-  console.log("this is user: ", getUser);
+  const { user: authUser } = useAuth(); // Get user data from AuthContext
+  const [userId, setUser] = useState<any>(null);
+
+  const latitude = -36.848461;
+  const longitude = 174.763336;
   const [modalVisible, setModalVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
@@ -169,32 +172,36 @@ export default function HomePage() {
   };
 
   const fetchGenerate = async (
-    user: string | undefined,
+    userId: string | undefined, // userId passed here
     longitude: number,
     latitude: number,
     type: number
   ) => {
     try {
-      const userId = getUser(); // Get user ID
-      const selectedType =
-        selectedCategories.length > 0 ? selectedCategories[0] : type; // Determine type based on selection
+      if (!userId) {
+        console.error("User ID is not provided.");
+        return;
+      }
 
-      // Sending this data to API
+      const selectedType =
+        selectedCategories.length > 0 ? selectedCategories[0] : type;
+
+      //print out data being sent
       console.log("Sending request to generate outfit with data:", {
-        user: userId,
+        userId: userId,
         longitude,
         latitude,
         type: selectedType,
       });
 
       const response = await axios.post(API_Generate, {
-        user: userId,
+        userId: userId,
         longitude,
         latitude,
         type: selectedType,
       });
 
-      console.log("API response:", response.data); // Log the entire response
+      console.log("API response:", response.data);
 
       if (response.data && response.data.imageId) {
         return response.data.imageId;
@@ -211,15 +218,13 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    const latitude = -36.848461;
-    const longitude = 174.763336;
+    // Get user info using getUser
+    const currentUser = getUser();
+    setUser(currentUser); // Set the user state
+
     fetchWeatherData(latitude, longitude);
     fetchOutfitCategories();
-    if (user) {
-      fetchGenerate(user.userId, longitude, latitude, 0);
-    } else {
-      console.warn("User is not available for outfit generation.");
-    }
+    console.log("Current user:", currentUser);
   }, []);
 
   // this is a placeholder for notifications if we want to continue developing
@@ -285,21 +290,38 @@ export default function HomePage() {
       <Pressable
         style={[
           styles.generateButton,
-          { backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" }, // Change color based on state
+          { backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" },
         ]}
-        onPressIn={() => setButtonPressed(true)} // Set pressed state when pressing in
-        onPressOut={() => setButtonPressed(false)} // Reset pressed state when pressing out
+        onPressIn={() => setButtonPressed(true)}
+        onPressOut={() => setButtonPressed(false)}
         onPress={async () => {
           try {
-            // Call the generate outfit API when the button is pressed
-            console.log("User: ", user);
-            const generatedOutfit = await fetchGenerate();
+            // Retrieve user data using useAuth
 
-            if (generatedOutfit?.imageUrl) {
-              setGeneratedImage(generatedOutfit.imageUrl); // Set image URL if successful
-              setIsModalVisible(true); // Open the modal to display the generated outfit
+            if (userId) {
+              // Ensure user is authenticated
+              latitude;
+              longitude;
+              const type =
+                selectedCategories.length > 0 ? selectedCategories[0] : 0;
+
+              // Call fetchGenerate with userId, longitude, latitude, and type
+              const generatedOutfit = await fetchGenerate(
+                userId.userId, // Pass the userId from useAuth
+                longitude,
+                latitude,
+                type
+              );
+
+              if (generatedOutfit) {
+                setGeneratedImage(generatedOutfit); // Set image URL if successful
+                setIsModalVisible(true); // Open the modal to display the generated outfit
+              } else {
+                console.error("No outfit image generated.");
+              }
             } else {
-              console.error("No image URL returned from the API.");
+              console.warn("User: ", userId);
+              console.warn("User is not authenticated.");
             }
           } catch (error) {
             console.error("Error generating outfit:", error);
