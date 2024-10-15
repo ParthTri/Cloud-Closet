@@ -14,9 +14,11 @@ import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { getUser } from "../lib/auth";
 
 export default function HomePage() {
-  const { user, logout } = useAuth(); // Get user data from AuthContext
+  const { user } = useAuth(); // Get user data from AuthContext
+  console.log("this is user: ", getUser);
   const [modalVisible, setModalVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [buttonPressed, setButtonPressed] = useState(false);
@@ -32,38 +34,11 @@ export default function HomePage() {
 
   //weather API
   const API_Weather = "https://cloudcloset.kolide.co.nz/api/weather";
+  //outfit category API
   const OUTFIT_CATEGORIES_API_URL =
-    "http://cloudcloset.kolide.co.nz/api/outfitCategory/allMethod";
+    "http://cloudcloset.kolide.co.nz/api/outfitCategory/all";
+  //generate outfit API
   const API_Generate = "https://cloudcloset.kolide.co.nz/api/genOutfit";
-
-  const fetchGenerate = async (
-    userId: string,
-    longitude: number,
-    latitude: number,
-    type: number
-  ) => {
-    try {
-      const response = await axios.post(API_Generate, {
-        userId,
-        longitude,
-        latitude,
-        type,
-      });
-
-      if (response.data) {
-        console.log("Generated outfit data:", response.data);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error(
-          "Axios error:",
-          error.response ? error.response.data : error.message
-        );
-      } else {
-        console.error("Error:", error);
-      }
-    }
-  };
 
   const [weatherData, setWeatherData] = useState({
     weather: "Loading...",
@@ -83,7 +58,7 @@ export default function HomePage() {
         latitude,
         longitude,
       });
-      //console.log("Weather data response:", response.data);
+      console.log("Weather data response:", response.data);
       const { data, error } = response.data;
 
       if (error) {
@@ -155,13 +130,6 @@ export default function HomePage() {
     }
   };
 
-  useEffect(() => {
-    const latitude = -36.848461;
-    const longitude = 174.763336;
-    fetchWeatherData(latitude, longitude);
-    fetchOutfitCategories();
-  }, []);
-
   interface WeatherProps {
     weather: string;
     temperature: number | null;
@@ -200,13 +168,68 @@ export default function HomePage() {
     );
   };
 
-  // test - need to replace??? with actual notifs
+  const fetchGenerate = async (
+    user: string | undefined,
+    longitude: number,
+    latitude: number,
+    type: number
+  ) => {
+    try {
+      const userId = getUser(); // Get user ID
+      const selectedType =
+        selectedCategories.length > 0 ? selectedCategories[0] : type; // Determine type based on selection
+
+      // Sending this data to API
+      console.log("Sending request to generate outfit with data:", {
+        user: userId,
+        longitude,
+        latitude,
+        type: selectedType,
+      });
+
+      const response = await axios.post(API_Generate, {
+        user: userId,
+        longitude,
+        latitude,
+        type: selectedType,
+      });
+
+      console.log("API response:", response.data); // Log the entire response
+
+      if (response.data && response.data.imageId) {
+        return response.data.imageId;
+      } else {
+        console.error("No image URL returned from the API.");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error:", error.response?.data || error.message);
+      } else {
+        console.error("Error:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const latitude = -36.848461;
+    const longitude = 174.763336;
+    fetchWeatherData(latitude, longitude);
+    fetchOutfitCategories();
+    if (user) {
+      fetchGenerate(user.userId, longitude, latitude, 0);
+    } else {
+      console.warn("User is not available for outfit generation.");
+    }
+  }, []);
+
+  // this is a placeholder for notifications if we want to continue developing
   const notifications = [
     { id: 1, message: "New outfit suggestion available!" },
     { id: 2, message: "Your outfit has been saved successfully." },
     { id: 3, message: "Weather update: Chance of rain today." },
   ];
 
+  //styling
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -264,20 +287,24 @@ export default function HomePage() {
           styles.generateButton,
           { backgroundColor: buttonPressed ? "#F9F9F9" : "#8ABAE3" }, // Change color based on state
         ]}
-        onPressIn={() => setButtonPressed(true)}
+        onPressIn={() => setButtonPressed(true)} // Set pressed state when pressing in
+        onPressOut={() => setButtonPressed(false)} // Reset pressed state when pressing out
         onPress={async () => {
           try {
             // Call the generate outfit API when the button is pressed
-            //const generatedOutfit = await fetchGenerate();
-            //setGeneratedImage(generatedOutfit.imageUrl); // Set the image URL or other result you need
-            setIsModalVisible(true); // Open the modal after generating the outfit
+            console.log("User: ", user);
+            const generatedOutfit = await fetchGenerate();
+
+            if (generatedOutfit?.imageUrl) {
+              setGeneratedImage(generatedOutfit.imageUrl); // Set image URL if successful
+              setIsModalVisible(true); // Open the modal to display the generated outfit
+            } else {
+              console.error("No image URL returned from the API.");
+            }
           } catch (error) {
             console.error("Error generating outfit:", error);
-          } finally {
-            setButtonPressed(false); // Reset button state
           }
         }}
-        onPressOut={() => setButtonPressed(false)}
       >
         <Text style={styles.generateButtonText}>GENERATE OUTFIT</Text>
       </Pressable>
@@ -379,56 +406,6 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 24,
-    fontWeight: "bold",
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    width: "80%",
-    backgroundColor: "#FFF",
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 15,
-  },
-  notificationBox: {
-    backgroundColor: "#F9F9F9",
-    borderRadius: 8,
-    padding: 15,
-    marginVertical: 5,
-    width: "100%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  noNotificationsText: {
-    fontSize: 16,
-    color: "gray",
-  },
-  closeButton: {
-    marginTop: 20,
-    backgroundColor: "#8ABAE3",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: "#FFF",
     fontWeight: "bold",
   },
   weatherContainer: {
@@ -538,6 +515,56 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   //modal stuff
+  notificationBox: {
+    backgroundColor: "#F9F9F9",
+    borderRadius: 8,
+    padding: 15,
+    marginVertical: 5,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  noNotificationsText: {
+    fontSize: 16,
+    color: "gray",
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: "#8ABAE3",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "#FFF",
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
   modalText: {
     fontSize: 18,
     paddingBottom: 10,
