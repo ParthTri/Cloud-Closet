@@ -19,6 +19,12 @@ export enum OutfitType {
   CASUAL,
 }
 
+export const OutfitTypeName = {
+  FORMAL: 'formal',
+  CASUAL: 'casual',
+  DRESSY: 'dressy',
+};
+
 export interface GeneratedOutfitItem {
   imaegId: string;
   processedUrl: string;
