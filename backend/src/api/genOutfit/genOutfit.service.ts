@@ -5,6 +5,7 @@ import {
   GenOutfitDTO,
   OutfitItemCategory,
   OutfitType,
+  OutfitTypeName,
 } from './interface/genOutfit.dto';
 import { SupabaseProvider } from 'src/supabase/supabase.service';
 
@@ -81,10 +82,28 @@ export class GenOutfitService {
     // Filtering responses to match the search tag in the image category
     data.forEach((val) => {
       val.ImageCategory.forEach((imageCat) => {
-        if (imageCat.ItemCategory['name'] == searchTag) {
+        if (
+          imageCat.ItemCategory['name'] == searchTag ||
+          imageCat.ItemCategory['name'] == 'neutral'
+        ) {
           outfit.push(val);
         }
       });
+    });
+
+    console.log('formal' == OutfitTypeName[OutfitType[req.type]]);
+
+    const filteredData = data.filter((val) => {
+      if (val.ImageCategory.length == 0) {
+        return false;
+      }
+
+      const ret = val.ImageCategory.filter(
+        (x) =>
+          x['ItemCategory']['name'] == OutfitTypeName[OutfitType[req.type]],
+      );
+
+      return ret.length > 0;
     });
 
     const payload = [];
@@ -92,42 +111,28 @@ export class GenOutfitService {
     let BOTTOMS = false;
     let JACKET = false;
     let FOOTWEAR = false;
-    outfit.forEach((item) => {
+    while (!(TOP && BOTTOMS && JACKET && FOOTWEAR)) {
+      const index = Math.floor(Math.random() * filteredData.length);
+      const item = filteredData[index];
       if (item['ImageCategory'].length > 1) {
         item['ImageCategory'].forEach((cat) => {
           const meta: string = cat['ItemCategory']['metaCategory'];
-          if (req.type == OutfitType.FORMAL) {
-            if (!TOP && meta == 'TOP') {
-              payload.push(item);
-              TOP = true;
-            } else if (!BOTTOMS && meta == 'BOTTOM') {
-              payload.push(item);
-              BOTTOMS = true;
-            } else if (!FOOTWEAR && meta == 'FOOTWEAR') {
-              payload.push(item);
-              FOOTWEAR = true;
-            } else if (!JACKET && meta == 'JACKET') {
-              payload.push(item);
-              JACKET = true;
-            }
-          } else {
-            if (!TOP && meta == 'TOP') {
-              payload.push(item);
-              TOP = true;
-            } else if (!BOTTOMS && meta == 'BOTTOM') {
-              payload.push(item);
-              BOTTOMS = true;
-            } else if (!FOOTWEAR && meta == 'FOOTWEAR') {
-              payload.push(item);
-              FOOTWEAR = true;
-            } else if (!JACKET && meta == 'JACKET') {
-              payload.push(item);
-              JACKET = true;
-            }
+          if (!TOP && meta == 'TOP') {
+            payload.push(item);
+            TOP = true;
+          } else if (!BOTTOMS && meta == 'BOTTOM') {
+            payload.push(item);
+            BOTTOMS = true;
+          } else if (!FOOTWEAR && meta == 'FOOTWEAR') {
+            payload.push(item);
+            FOOTWEAR = true;
+          } else if (!JACKET && meta == 'JACKET') {
+            payload.push(item);
+            JACKET = true;
           }
         });
       }
-    });
+    }
 
     return this.formatOutfitData(payload);
   }
