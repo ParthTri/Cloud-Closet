@@ -1,9 +1,10 @@
-import { View, Text, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet, TextInput } from "react-native";
+import { View, Text, FlatList, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet, TextInput } from "react-native";
 import { MaterialIcons, Entypo, Ionicons } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
+import { getUser  } from "../lib/auth.ts";
 import { useAuth } from '../authContext';
 import axios from 'axios';
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 
 // API URLS
 const OUTFIT_CATEGORIES_API_URL = 'https://cloudcloset.kolide.co.nz/api/outfitCategory/all'; //Get all clothing categories API
@@ -15,48 +16,63 @@ interface Category {
   timestamp: string;
 }
 
+const fallbackCategories = {
+  data: [
+    { created_at: "2024-10-05T01:23:35.632087+00:00", id: 1, name: "Spring" },
+    { created_at: "2024-10-05T01:23:49.004092+00:00", id: 2, name: "Summer" },
+    { created_at: "2024-10-05T01:24:00.620179+00:00", id: 3, name: "Fall" },
+    { created_at: "2024-10-05T01:24:11.974037+00:00", id: 4, name: "Winter" },
+    { created_at: "2024-10-05T01:24:24.265579+00:00", id: 5, name: "Formal" },
+    { created_at: "2024-10-05T01:24:35.839981+00:00", id: 6, name: "Informal" }
+  ],
+  error: null
+};
 //const { width } = Dimensions.get("window");
 
 async function getUserItems(
-  userID: string | undefined,
-  filter: string
+	userID: string | undefined,
+	filter: string
 ): Promise<any[]> {
-  if (!userID) {
-    return [{}];
-  }
-  try {
-    const url = filter.length === 0 
-      ? `http://cloudcloset.kolide.co.nz/api/image/${userID}`
-      : `http://cloudcloset.kolide.co.nz/api/image/search/${userID}/${filter}`;
-      
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
-    const json = await response.json();
-    return json.data; 
-  } catch (error) {
-    console.error('Error fetching user items:', error);
-    Alert.alert('Error', 'Failed to fetch user items.');
-    return [];
-  }
+	if (userID == undefined) {
+		return [{}];
+	}
+	let data;
+	if (filter.length == 0) {
+		data = await fetch(`https://cloudcloset.kolide.co.nz/api/image/${userID}`, {
+			method: "GET",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+		});
+	} else {
+		data = await fetch(
+			`http://cloudcloset.kolide.co.nz/api/image/search/${userID}/${filter}`,
+			{
+				method: "GET",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+			}
+		);
+	}
+
+	const json = await data.json();
+	return json;
 }
 
 export default function Outfits() {
-  const { user } = useAuth();
-  const userID: string | undefined = user?.userID;
- 
+  const user = getUser();
+	const userID: string | undefined = user?.userId;
   const [items, setItems] = useState<any[]>([]);
-  const [buttonPressed, setButtonPressed] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
- // const [categories, setCategories] = useState<Category[]>([]); // save category
-  const [categories, setCategories] = useState([]);
   const [topsImages, setTopsImages] = useState<any[]>([]);
   const [bottomsImages, setBottomsImages] = useState<any[]>([]);
   const [footwearImages, setFootwearImages] = useState<any[]>([]);
+  const [buttonPressed, setButtonPressed] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+ // const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(fallbackCategories.data); // temporary
   const [currentIndex, setCurrentIndex] = useState(0);
   const [outfitName, setOutfitName] = useState<string>('');
   const [isEditable, setIsEditable] = useState(true);
@@ -66,27 +82,26 @@ export default function Outfits() {
  const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
  const [fetchError, setFetchError] = useState<string | null>(null);
  
- const searchForItem = async (search: string) => {
-   const filter = selectedCategories.join(','); 
-   await getUserItems(userID, filter).then((x) => {
-	 setItems(x);
-   });
- };
- // Function to get clothing category
+ // Function to get outfit categories
  const fetchOutfitCategories = async () => {
    try {
+/* bring this back after
 	 const response = await axios.get(OUTFIT_CATEGORIES_API_URL);
 	 if (Array.isArray(response.data.data)) {
 	   setCategories(response.data.data);
-	   setIsLoadingCategories(false);
+	   setIsLoadingCategories(false); 
 	 } else {
 	   console.error('Unexpected response format:', response.data);
 	 }
+*/
+   setCategories(fallbackCategories.data); // temporary
+   setIsLoadingCategories(false); // temporary
    } catch (error) {
 	 console.error('Error fetching categories:', error);
    }
  };
 
+ // Function to save outfit 
   const saveOutfit = async () => {
     try {
       const outfitData = {
@@ -108,19 +123,21 @@ export default function Outfits() {
     }
   };
 
-
+  // Get Items & Categories
   useEffect(() => {
-    getUserItems(userID, "").then((x) => setItems(x));
+    getUserItems(userID, "").then((x) => setItems(x["data"]));
     fetchOutfitCategories();
+    console.log("top images url: ", topsImages[currentIndex]?.imageURL);
   }, []);
-
-
+  
+  // Left Button
   const handleLeftPress = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? currentImages.length - 1 : prevIndex - 1
     );
   };
 
+  // Right Button 
   const handleRightPress = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === currentImages.length - 1 ? 0 : prevIndex + 1
@@ -169,7 +186,7 @@ export default function Outfits() {
           <Pressable onPress={handleLeftPress}>
             <Entypo name="chevron-thin-left" size={50} color="#8ABAE3"/>
           </Pressable>
-
+        
           {/* get Tops photos for slider */}
           {topsImages.length > 0 ? (
             <Image
@@ -246,23 +263,23 @@ export default function Outfits() {
             </Pressable>
           </View>
         ) : (
-		<ScrollView horizontal>
-          <View style={styles.categoriesContainer}>
-             {categories.map((category) => (
-                  <Pressable
-                    key={category.id}
-                    onPress={() => selectedCategory(category.id)}
-                    style={[
-                      styles.categoryButton,
-                      selectedCategories.includes(category.id) && styles.selectedCategory,
-                    ]}
-                  >
-                    <Text style={styles.categoryText}>{category.name}</Text>
-                  </Pressable>
-                ))}
-          </View>
-		</ScrollView>
-        )} 
+        <ScrollView horizontal>
+              <View style={styles.categoriesContainer}>
+                {categories.map((category) => (
+                      <Pressable
+                        key={category.id}
+                        onPress={() => selectedCategory(category.id)}
+                        style={[
+                          styles.categoryButton,
+                          selectedCategories.includes(category.id) && styles.selectedCategory,
+                        ]}
+                      >
+                        <Text style={styles.categoryText}>{category.name}</Text>
+                      </Pressable>
+                    ))}
+              </View>
+        </ScrollView>
+        )}
 
         {/* Outfit Name Input */}
         <Text style={styles.outfitNameText}>Outfit Name:</Text>
