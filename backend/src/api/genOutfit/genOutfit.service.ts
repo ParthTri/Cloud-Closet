@@ -42,10 +42,15 @@ export class GenOutfitService {
   }
 
   async generateOutft(req: GenOutfitDTO) {
-    const weatherInfo = await this.weatherService.getWeatherData({
-      latitude: req.latitude,
-      longitude: req.longitude,
-    });
+    let weatherInfo;
+    try {
+      weatherInfo = await this.weatherService.getWeatherData({
+        latitude: req.latitude,
+        longitude: req.longitude,
+      });
+    } catch (e) {
+      return { data: null, error: e };
+    }
 
     // Set the search tag
     const searchTag = weatherInfo.data.temperature <= 16 ? 'cool' : 'warm';
@@ -76,7 +81,7 @@ export class GenOutfitService {
       .eq('userId', req.userId);
 
     if (error) {
-      return error;
+      return { data: null, error };
     }
 
     // Filtering responses to match the search tag in the image category
@@ -112,28 +117,32 @@ export class GenOutfitService {
     let JACKET = false;
     let FOOTWEAR = false;
     while (!(TOP && BOTTOMS && JACKET && FOOTWEAR)) {
-      const index = Math.floor(Math.random() * filteredData.length);
-      const item = filteredData[index];
-      if (item['ImageCategory'].length > 1) {
-        item['ImageCategory'].forEach((cat) => {
-          const meta: string = cat['ItemCategory']['metaCategory'];
-          if (!TOP && meta == 'TOP') {
-            payload.push(item);
-            TOP = true;
-          } else if (!BOTTOMS && meta == 'BOTTOM') {
-            payload.push(item);
-            BOTTOMS = true;
-          } else if (!FOOTWEAR && meta == 'FOOTWEAR') {
-            payload.push(item);
-            FOOTWEAR = true;
-          } else if (!JACKET && meta == 'JACKET') {
-            payload.push(item);
-            JACKET = true;
-          }
-        });
+      try {
+        const index = Math.floor(Math.random() * filteredData.length);
+        const item = filteredData[index];
+        if (item['ImageCategory'].length > 1) {
+          item['ImageCategory'].forEach((cat) => {
+            const meta: string = cat['ItemCategory']['metaCategory'];
+            if (!TOP && meta == 'TOP') {
+              payload.push(item);
+              TOP = true;
+            } else if (!BOTTOMS && meta == 'BOTTOM') {
+              payload.push(item);
+              BOTTOMS = true;
+            } else if (!FOOTWEAR && meta == 'FOOTWEAR') {
+              payload.push(item);
+              FOOTWEAR = true;
+            } else if (!JACKET && meta == 'JACKET') {
+              payload.push(item);
+              JACKET = true;
+            }
+          });
+        }
+      } catch (e) {
+        continue;
       }
     }
 
-    return this.formatOutfitData(payload);
+    return { data: this.formatOutfitData(payload), error: null };
   }
 }
