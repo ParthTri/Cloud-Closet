@@ -10,9 +10,11 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { getUser } from "../lib/auth";
 
 export default function Profile() {
   const router = useRouter();
+  const user = getUser();
 
   const [form, setForm] = useState({
     emailNotifications: true,
@@ -48,8 +50,10 @@ export default function Profile() {
         <View style={styles.section}>
           <TouchableOpacity style={styles.profile}>
             <View style={styles.profileBody}>
-              <Text style={styles.profileName}>John Doe</Text>
-              <Text style={styles.profileHandle}>youremail@domain.com</Text>
+              <Text style={styles.profileName}>John Test</Text>
+              <Text style={styles.profileHandle}>
+                {user?.email || "youremail@domain.com"}
+              </Text>
             </View>
             <AntDesign name="right" size={22} color="#bcbcbc" />
           </TouchableOpacity>
