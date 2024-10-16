@@ -116,10 +116,14 @@ export class GenOutfitService {
     let BOTTOMS = false;
     let JACKET = false;
     let FOOTWEAR = false;
-    while (!(TOP && BOTTOMS && JACKET && FOOTWEAR)) {
+    while (
+      !(TOP && BOTTOMS && JACKET && FOOTWEAR) &&
+      filteredData.length != 0
+    ) {
       try {
         const index = Math.floor(Math.random() * filteredData.length);
         const item = filteredData[index];
+        filteredData.splice(index, 1);
         if (item['ImageCategory'].length > 1) {
           item['ImageCategory'].forEach((cat) => {
             const meta: string = cat['ItemCategory']['metaCategory'];
