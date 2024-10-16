@@ -17,7 +17,7 @@ import axios from "axios";
 import { getUser } from "../lib/auth";
 
 export default function HomePage() {
-  const { user: authUser } = useAuth(); // Get user data from AuthContext
+  const user = getUser(); // Get use from auth.ts
   const [userId, setUser] = useState<any>(null);
 
   const latitude = -36.848461;
@@ -307,7 +307,7 @@ export default function HomePage() {
 
               // Call fetchGenerate with userId, longitude, latitude, and type
               const generatedOutfit = await fetchGenerate(
-                userId.userId, // Pass the userId from useAuth
+                user?.userId, // Pass the userId from useAuth
                 longitude,
                 latitude,
                 type
