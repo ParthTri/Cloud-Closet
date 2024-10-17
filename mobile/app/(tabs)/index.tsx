@@ -8,9 +8,12 @@ import {
   Modal,
   Alert,
   Button,
+  FlatList,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useAuth } from "../authContext";
-import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import { Ionicons, FontAwesome, AntDesign } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -170,9 +173,8 @@ export default function HomePage() {
       </View>
     );
   };
-
   const fetchGenerate = async (
-    userId: string | undefined, // userId passed here
+    userId: string | undefined,
     longitude: number,
     latitude: number,
     type: number
@@ -186,7 +188,6 @@ export default function HomePage() {
       const selectedType =
         selectedCategories.length > 0 ? selectedCategories[0] : type;
 
-      //print out data being sent
       console.log("Sending request to generate outfit with data:", {
         userId: userId,
         longitude,
@@ -203,10 +204,21 @@ export default function HomePage() {
 
       console.log("API response:", response.data);
 
-      if (response.data && response.data.imageId) {
-        return response.data.imageId;
+      if (response.data && response.data.data.length > 0) {
+        const generatedImages = response.data.data.map(
+          (item: { processedUrl: any; imageCategory: any[] }) => ({
+            imageUrl: item.processedUrl,
+            categories: item.imageCategory
+              .map((cat) => cat.categoryName)
+              .join(", "),
+          })
+        );
+
+        // Return array of generated images with their categories
+        return generatedImages;
       } else {
-        console.error("No image URL returned from the API.");
+        console.error("No images returned from the API.");
+        return [];
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -313,7 +325,7 @@ export default function HomePage() {
                 type
               );
 
-              if (generatedOutfit) {
+              if (generatedOutfit && generatedOutfit.length > 0) {
                 setGeneratedImage(generatedOutfit); // Set image URL if successful
                 setIsModalVisible(true); // Open the modal to display the generated outfit
               } else {
@@ -331,7 +343,7 @@ export default function HomePage() {
         <Text style={styles.generateButtonText}>GENERATE OUTFIT</Text>
       </Pressable>
 
-      {/* Generated outfit image */}
+      {/* Generated outfit images */}
       <Modal
         visible={isModalVisible}
         transparent={true}
@@ -340,56 +352,80 @@ export default function HomePage() {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            {!isCategorySelectionVisible ? (
-              <>
-                <Text style={styles.modalTitle}>Generated Outfit:</Text>
-                {generatedImage && (
-                  <Image
-                    source={{ uri: generatedImage }}
-                    style={styles.generatedImage}
-                  />
-                )}
-                <Text style={styles.modalText}>
-                  Would you like to save this outfit?
-                </Text>
-                <View style={styles.modalButton}>
-                  <Button
-                    title="Yes"
-                    onPress={() => setIsCategorySelectionVisible(true)}
-                  />
-                  <Button title="No" onPress={() => setIsModalVisible(false)} />
-                </View>
-              </>
-            ) : (
-              <>
-                <Text style={styles.modalText}>Select categories:</Text>
-                <ScrollView
-                  style={styles.categoriesContainer}
-                  horizontal={true}
-                >
-                  {categories.map((category) => (
-                    <Pressable
-                      key={category.categoryID}
-                      onPress={() => selectedCategory(category.categoryID)}
-                      style={[
-                        styles.categoryButton,
-                        selectedCategories.includes(category.categoryID) &&
-                          styles.selectedCategory,
-                      ]}
-                    >
-                      <Text style={styles.categoryText}>{category.name}</Text>
-                    </Pressable>
-                  ))}
-                </ScrollView>
-                <View style={styles.modalButton}>
-                  <Button title="Save" onPress={saveImageWithCategories} />
-                  <Button
-                    title="Cancel"
+            <ScrollView contentContainerStyle={styles.scrollView}>
+              {!isCategorySelectionVisible ? (
+                <>
+                  <Text style={styles.modalTitle}>Generated Outfit:</Text>
+                  <TouchableOpacity
                     onPress={() => setIsModalVisible(false)}
-                  />
-                </View>
-              </>
-            )}
+                    style={styles.closeIconContainer} // Add a style for positioning
+                  >
+                    <AntDesign name="closecircleo" size={30} color="black" />
+                  </TouchableOpacity>
+
+                  {Array.isArray(generatedImage) &&
+                  generatedImage.length > 0 ? (
+                    generatedImage.map((item, index) => (
+                      <View key={index} style={styles.generatedImageContainer}>
+                        <Image
+                          source={{ uri: item.imageUrl }}
+                          style={styles.generatedImage}
+                          resizeMode="contain"
+                        />
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={styles.modalText}>No outfit generated</Text>
+                  )}
+                  <Text style={styles.modalText}>
+                    Would you like to save this outfit?
+                  </Text>
+                  <View style={styles.modalButtonContainer}>
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => setIsCategorySelectionVisible(true)}
+                    >
+                      <Text style={styles.modalButtonText}>Yes</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => setIsModalVisible(false)}
+                    >
+                      <Text style={styles.modalButtonText}>No</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.modalText}>Select categories:</Text>
+                  <ScrollView
+                    style={styles.categoriesContainer}
+                    horizontal={true}
+                  >
+                    {categories.map((category) => (
+                      <Pressable
+                        key={category.categoryID}
+                        onPress={() => selectedCategory(category.categoryID)}
+                        style={[
+                          styles.categoryButton,
+                          selectedCategories.includes(category.categoryID) &&
+                            styles.selectedCategory,
+                        ]}
+                      >
+                        <Text style={styles.categoryText}>{category.name}</Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                  <View style={styles.modalButtonContainer}>
+                    <Button title="Save" onPress={saveImageWithCategories} />
+                    <Button
+                      title="Cancel"
+                      onPress={() => setIsModalVisible(false)}
+                    />
+                  </View>
+                </>
+              )}
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -494,6 +530,19 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
     elevation: 2,
   },
+  generatedImageContainer: {
+    // flex: 1,
+    // margin: 5,
+    // alignItems: "center",
+    // maxWidth: "48%",
+    // borderRadius: 10,
+    // overflow: "hidden",
+    // justifyContent: "center",
+    // marginBottom: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+  },
   generateButtonText: {
     fontSize: 18,
     fontWeight: "bold",
@@ -517,6 +566,9 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
     elevation: 2,
   },
+  scrollView: {
+    flexGrow: 1,
+  },
   outfitItem: {
     width: "48%",
     backgroundColor: "#fff",
@@ -537,6 +589,11 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   //modal stuff
+  row: {
+    flex: 1,
+    justifyContent: "space-evenly", // Space out the items in each row
+    marginBottom: 10,
+  },
   notificationBox: {
     backgroundColor: "#F9F9F9",
     borderRadius: 8,
@@ -557,12 +614,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: "#8ABAE3",
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     borderRadius: 5,
   },
   closeButtonText: {
     color: "#FFF",
     fontWeight: "bold",
+    textAlign: "center",
   },
   modalContainer: {
     flex: 1,
@@ -570,33 +628,44 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
+  modalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
   modalContent: {
-    width: "80%",
-    backgroundColor: "#FFF",
-    borderRadius: 10,
+    backgroundColor: "white",
     padding: 20,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
+    borderRadius: 10,
+    width: "90%",
+    maxHeight: "80%",
+    position: "relative",
   },
   modalTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 15,
+    textAlign: "center",
+    marginBottom: 20,
   },
   modalText: {
     fontSize: 18,
-    paddingBottom: 10,
+    fontWeight: "bold",
+    alignContent: "center",
+    textAlign: "center",
+    marginTop: 30,
   },
   modalButton: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "60%",
-    borderRadius: 10,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#8ABAE3",
+    paddingVertical: 5,
+    flex: 1,
+    marginHorizontal: 5,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 16,
+    textAlign: "center",
   },
   categoriesContainer: {
     maxHeight: 60,
@@ -618,10 +687,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   generatedImage: {
-    width: 200,
-    height: 300,
-    resizeMode: "contain",
-    marginVertical: 20,
-    borderRadius: 10,
+    width: 250,
+    height: 250,
+  },
+  closeIconContainer: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 1,
   },
 });
