@@ -1,14 +1,16 @@
-import { View, Text, FlatList, Alert, Image, Pressable, Dimensions, ScrollView, StyleSheet, TextInput } from "react-native";
+import { View, Text, FlatList, Alert, Image, Pressable, ScrollView, StyleSheet, TextInput } from "react-native";
 import { MaterialIcons, Entypo, Ionicons } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
-import { getUser  } from "../lib/auth.ts";
+import { getUser  } from "../lib/auth";
 import { useAuth } from '../authContext';
 import axios from 'axios';
-import React, { Suspense, useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect, useRef } from "react";
+import { setItem } from "expo-secure-store";
 
 // API URLS
 const OUTFIT_CATEGORIES_API_URL = 'https://cloudcloset.kolide.co.nz/api/outfitCategory/all'; //Get all clothing categories API
 const SAVE_OUTFIT_API_URL = 'http://cloudcloset.kolide.co.nz/api/outfit/'; 
+const TOP_META_CATEGORY = "TOP";
 
 interface Category {
   id: number;
@@ -16,6 +18,15 @@ interface Category {
   timestamp: string;
 }
 
+interface Item {
+  imageId: string;
+  created_at: string;
+  rawUrl: string;
+  processedUrl: string;
+  userId: string;
+}
+
+// backup categories incase API fetch doesnt work
 const fallbackCategories = {
   data: [
     { created_at: "2024-10-05T01:23:35.632087+00:00", id: 1, name: "Spring" },
@@ -37,6 +48,7 @@ async function getUserItems(
 		return [{}];
 	}
 	let data;
+	console.log(filter.length);
 	if (filter.length == 0) {
 		data = await fetch(`https://cloudcloset.kolide.co.nz/api/image/${userID}`, {
 			method: "GET",
@@ -71,13 +83,14 @@ export default function Outfits() {
   const [footwearImages, setFootwearImages] = useState<any[]>([]);
   const [buttonPressed, setButtonPressed] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
- // const [categories, setCategories] = useState([]);
-  const [categories, setCategories] = useState(fallbackCategories.data); // temporary
+  const [categories, setCategories] = useState([]);
+ // const [categories, setCategories] = useState(fallbackCategories.data); // temporary
   const [currentIndex, setCurrentIndex] = useState(0);
   const [outfitName, setOutfitName] = useState<string>('');
   const [isEditable, setIsEditable] = useState(true);
   const [currentImages, setCurrentImages] = useState<any[]>([]);
-
+  const scrollViewRef = useRef(null);
+  
  // Loading category data status
  const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
  const [fetchError, setFetchError] = useState<string | null>(null);
@@ -85,7 +98,7 @@ export default function Outfits() {
  // Function to get outfit categories
  const fetchOutfitCategories = async () => {
    try {
-/* bring this back after
+
 	 const response = await axios.get(OUTFIT_CATEGORIES_API_URL);
 	 if (Array.isArray(response.data.data)) {
 	   setCategories(response.data.data);
@@ -93,9 +106,9 @@ export default function Outfits() {
 	 } else {
 	   console.error('Unexpected response format:', response.data);
 	 }
-*/
-   setCategories(fallbackCategories.data); // temporary
-   setIsLoadingCategories(false); // temporary
+
+  // setCategories(fallbackCategories.data); // temporary
+ //  setIsLoadingCategories(false); // temporary
    } catch (error) {
 	 console.error('Error fetching categories:', error);
    }
@@ -125,9 +138,39 @@ export default function Outfits() {
 
   // Get Items & Categories
   useEffect(() => {
-    getUserItems(userID, "").then((x) => setItems(x["data"]));
-    fetchOutfitCategories();
-    console.log("top images url: ", topsImages[currentIndex]?.imageURL);
+    const fetchItems = async () => {
+      try {
+          const fetchedItems = await getUserItems(userID, "");
+          if (fetchedItems.length > 0) {
+            console.log("All items have been fetched!");
+          }
+          
+          if (fetchedItems.data) {
+              const tops = fetchedItems.data.filter(
+                  (item) => item.metaCategory === TOP_META_CATEGORY
+              );
+              setTopsImages(tops); // Set tops state with filtered items
+          } else {
+              console.warn("No data found for user items."); // Warn if no data
+          }
+      } catch (error) {
+          console.error("Error fetching items:", error);
+      }
+  };
+  
+  getUserItems(userID, "").then((x) => setItems(x["data"])); // shows images
+  getUserItems(userID, "").then((x) => {
+    if (setTopsImages != null) {
+      console.log("TOPS SET"); // checking if tops are set
+    }
+});
+  fetchItems(); 
+  fetchOutfitCategories();
+  console.log("top images url: ", topsImages[currentIndex]?.imageURL);
+  if (setItems != null) {
+    console.log("ITEMS SET"); // checking if items are set
+  }
+
   }, []);
   
   // Left Button
@@ -168,7 +211,18 @@ export default function Outfits() {
       setCurrentImages(filteredItems);
     }
   }, [selectedCategories, topsImages, bottomsImages, footwearImages, items]);
+  
+  const renderTops = ({ item }: { item: Item }) => (
+    <View style={styles.sliderContainer}>
+        {item.processedUrl ? ( // Check if processedUrl exists
+            <Image source={{ uri: item.processedUrl }} style={styles.sliderImage} />
+        ) : (
+            <Text>No Image Available</Text>
+        )}
+    </View>
+);
 
+console.log("Tops Images URLs: ", topsImages.map(item => item.processedUrl,)); // empty
   return (
     <View style={styles.container}>
       {/* header */}
@@ -188,14 +242,12 @@ export default function Outfits() {
           </Pressable>
         
           {/* get Tops photos for slider */}
-          {topsImages.length > 0 ? (
-            <Image
-              source={{ uri: topsImages[currentIndex]?.imageURL }} 
-              style={styles.sliderImage} 
-            />
-          ) : (
-            <Text>Loading 'Tops' Images...</Text>
-          )}
+          <FlatList
+            data={topsImages}
+            renderItem={renderTops}
+            keyExtractor={(item) => item.imageId.toString()}
+            contentContainerStyle={styles.sliderImage}
+          />
           
           {/* Right Button */}
           <Pressable onPress={handleRightPress}>
@@ -360,86 +412,89 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 		alignItems: "center",
 		borderWidth: 2,
-	  },
+	},
 	saveButtonText: {
 		fontSize: 18,
 		fontWeight: "bold",
-	  },
-	categoriesContainer: {
+	},
+  categoriesContainer: {
 		maxHeight: 60,
-        flexDirection: 'row',
-    },
-    categoryButton: {
-        backgroundColor: '#eee',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        margin: 5,
-        borderRadius: 10,
+    flexDirection: 'row',
+  },
+  categoryButton: {
+    backgroundColor: '#eee',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    margin: 5,
+    borderRadius: 10,
 		maxHeight: 40,
-    },
-    selectedCategory: {
-        backgroundColor: '#007AFF', 
-    },
-    categoryText: {
-        color: '#000',
-        fontSize: 16,
-    },
+  },
+  selectedCategory: {
+    backgroundColor: '#007AFF', 
+  },
+  categoryText: {
+    color: '#000',
+    fontSize: 16,
+  },
 	sliderImage: {
-		width: 100,
-		height: 100,
+		width: 150,
+		height: 150,
 		borderRadius: 8,
+    borderColor: "blue",
+    borderWidth: 1,
+    alignContent: "space-evenly",
 	},
 	sliderContainer: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-		marginBottom: 20,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 20,
 	},
 	retryButton: {
-		marginTop: 10,
-		padding: 10,
-		backgroundColor: '#8ABAE3',
-		borderRadius: 5,
-		alignItems: 'center',
+      marginTop: 10,
+      padding: 10,
+      backgroundColor: '#8ABAE3',
+      borderRadius: 5,
+      alignItems: 'center',
 	},
 	retryButtonText: {
-		color: '#FFFFFF',
-		fontSize: 16,
+      color: '#FFFFFF',
+      fontSize: 16,
 	},
 	outfitNameText: {
-		color: "#8ABAE3",
-		paddingVertical: 10,
-		paddingHorizontal: 10,
-		fontWeight: "bold",
-		fontSize: 20,
+      color: "#8ABAE3",
+      paddingVertical: 10,
+      paddingHorizontal: 10,
+      fontWeight: "bold",
+      fontSize: 20,
 	},
 	textInputText: {
-		flex: 1, 
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center", 
-		color: "#000000",
-		backgroundColor: "#D0D0D0",
-		borderRadius: 5,
-		padding: 10, 
-		paddingHorizontal: 10,
-		fontSize: 14, 
-		borderWidth: 1, 
-		borderColor: "#A0A0A0", 
+      flex: 1, 
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center", 
+      color: "#000000",
+      backgroundColor: "#D0D0D0",
+      borderRadius: 5,
+      padding: 10, 
+      paddingHorizontal: 10,
+      fontSize: 14, 
+      borderWidth: 1, 
+      borderColor: "#A0A0A0", 
 	  },
 	  outfitNameContainer: { 
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginTop: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 10,
 	  },
 	  iconLabel: {
-		marginLeft: 5,                
-		fontSize: 12,                 
-		color: '#666',
+      marginLeft: 5,                
+      fontSize: 12,                 
+      color: '#666',
 	  },
 	  iconContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingHorizontal: 8, 
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 8, 
 	  },
 });
