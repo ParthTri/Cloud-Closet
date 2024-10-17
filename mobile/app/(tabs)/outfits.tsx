@@ -86,7 +86,6 @@ async function getUserItems(
 
   const json: { data: ImageInterface[]; error: string | null } =
     await data.json();
-
   return json;
 }
 
@@ -162,8 +161,8 @@ export default function Outfits() {
           const tops = fetchedItems.data.filter((item) => {
             if (
               item.categories.filter(
-                (cat) => cat.metaCateogryName == TOP_META_CATEGORY
-              )
+                (cat) => cat.metaCategoryName == TOP_META_CATEGORY
+              ).length > 0
             ) {
               return true;
             }
@@ -171,8 +170,8 @@ export default function Outfits() {
           const bottoms = fetchedItems.data.filter((item) => {
             if (
               item.categories.filter(
-                (cat) => cat.metaCateogryName == BOTTOM_META_CATEGORY
-              )
+                (cat) => cat.metaCategoryName == BOTTOM_META_CATEGORY
+              ).length > 0
             ) {
               return true;
             }
@@ -180,8 +179,8 @@ export default function Outfits() {
           const footwear = fetchedItems.data.filter((item) => {
             if (
               item.categories.filter(
-                (cat) => cat.metaCateogryName == FOOTWEAR_META_CATEGORY
-              )
+                (cat) => cat.metaCategoryName == FOOTWEAR_META_CATEGORY
+              ).length > 0
             ) {
               return true;
             }
@@ -250,10 +249,10 @@ export default function Outfits() {
     </View>
   );
 
-  console.log(
-    "Tops Images URLs: ",
-    topsImages.map((item) => item.processedUrl)
-  );
+  // console.log(
+  //   "Tops Images URLs: ",
+  //   topsImages.map((item) => item.processedUrl)
+  // );
 
   const renderBottoms = ({ item }: { item: Item }) => (
     <View style={styles.sliderContainer}>
