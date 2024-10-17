@@ -1,277 +1,273 @@
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Link, router } from "expo-router";
+import Entypo from "@expo/vector-icons/Entypo";
+import { Link, useRouter } from "expo-router";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { useState } from "react";
 
-// TODO: Need to add validation that the checkbox has been ticked
+export default function SignUp() {
+  const router = useRouter();
+  const [pressed, setPressed] = useState(false);
+  const [checkboxIsChecked, setCheckbox] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-export default function Signup() {
-	const fullNameRegex = /^[a-zA-Z']+(\s[a-zA-Z']+)*$/;
-	const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const fullNameRegex = /^[a-zA-Z']+(\s[a-zA-Z']+)*$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-	const [pressed, setPressed] = useState(false);
+  const validateInputs = () => {
+    if (!fullNameRegex.test(name)) {
+      setErrorMessage("Please enter a valid full name.");
+      return false;
+    }
 
-	// User data states for pushing to API later
-	const [name, setName] = useState("");
-	const [nameIsValid, setNameValidity] = useState(true);
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Please enter a valid email address.");
+      return false;
+    }
 
-	const [email, setEmail] = useState("");
-	const [emailIsValid, setEmailIsValid] = useState(true);
+    if (password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long.");
+      return false;
+    }
 
-	const [password, setPassword] = useState("");
-	const [passwordIsValid, setPasswordValidity] = useState(true);
+    if (!checkboxIsChecked) {
+      setErrorMessage("You must agree to the terms and conditions.");
+      return false;
+    }
 
-	const [checkboxIsChecked, setCheckbox] = useState(false);
-	const [toggleCheckMessage, setCheckMessage] = useState(false);
+    return true;
+  };
 
-	const [generalError, setError] = useState(true);
+  const submit = async () => {
+    if (!validateInputs()) {
+      setShowError(true);
+      return;
+    }
 
-	const submit = async () => {
-		try {
-			let notPush = false;
-			// Check Full Name
-			if (!fullNameRegex.test(name)) {
-				setNameValidity(false);
-				notPush = true;
-			} else {
-				setNameValidity(true);
-			}
+    try {
+      const response = await fetch("http://cloudcloset.kolide.co.nz/api/user", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Name: name,
+          Email: email.toLowerCase(),
+          Password: password,
+        }),
+      });
+      const json = await response.json();
+      if (json.error) {
+        setErrorMessage(json.error);
+        setShowError(true);
+      } else {
+        setShowError(false);
+        router.push("/(tabs)");
+      }
+    } catch (err) {
+      setErrorMessage("An error occurred. Please try again.");
+      setShowError(true);
+    }
+  };
 
-			// Check Email formatting
-			if (!emailRegex.test(email)) {
-				setEmailIsValid(false);
-				notPush = true;
-			} else {
-				setEmailIsValid(true);
-			}
+  return (
+    <View style={styles.container}>
+      <Link href="/" style={styles.back} asChild>
+        <AntDesign name="leftcircleo" size={30} color="black" />
+      </Link>
 
-			// Check Password
-			if (password.length < 6) {
-				setPasswordValidity(false);
-				notPush = true;
-			} else {
-				setPasswordValidity(true);
-			}
+      <View style={styles.header}>
+        <Text style={styles.welcomeText}>Join us</Text>
+        <Text style={styles.promptText}>Create your account below</Text>
+      </View>
 
-			// Checkbox
-			if (!checkboxIsChecked) {
-				setCheckMessage(true);
-				notPush = true;
-			} else {
-				setCheckMessage(false);
-			}
+      <View style={styles.form}>
+        <Text style={styles.label}>Full Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Your full name"
+          onChangeText={setName}
+          value={name}
+        />
 
-			if (notPush) {
-				return;
-			}
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          inputMode="email"
+          placeholder="you@example.com"
+          onChangeText={setEmail}
+          value={email}
+        />
 
-			const data = await fetch("http://cloudcloset.kolide.co.nz/api/user", {
-				method: "POST",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ Name: name, Email: email, Password: password }),
-			});
-			const json = await data.json();
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          style={styles.input}
+          secureTextEntry={true}
+          placeholder="••••••"
+          onChangeText={setPassword}
+          value={password}
+        />
 
-			// Handle email exists
-			if (
-				json["error"] == null &&
-				json["error"] == "User email already in use"
-			) {
-				setEmailIsValid(false);
-				return;
-			}
+        {showError && <Text style={styles.errorText}>{errorMessage}</Text>}
 
-			setError(true);
-			router.push("/(tabs)");
-		} catch (err) {
-			console.log(err);
-			setError(false);
-		}
-	};
+        <View style={styles.checkboxContainer}>
+          <BouncyCheckbox
+            fillColor="#8ABAE3"
+            isChecked={checkboxIsChecked}
+            onPress={() => setCheckbox(!checkboxIsChecked)}
+            style={styles.checkbox}
+          />
+          <Text style={styles.checkboxText}>
+            I agree to the terms & conditions
+          </Text>
+        </View>
+      </View>
 
-	return (
-		<View style={{ flex: 1, padding: 10 }}>
-			<Link href="/" style={styles.back} asChild>
-				<AntDesign name="leftcircleo" size={30} color="black" />
-			</Link>
-			<View style={styles.header}>
-				<Text style={{ fontSize: 24 }}>Sign Up</Text>
-				<Text style={{ fontSize: 48 }}>Welcome</Text>
-				<Text style={{ fontSize: 18 }}>Please create your account here</Text>
-			</View>
-			<View
-				style={{ padding: 20, height: "50%", justifyContent: "space-evenly" }}
-			>
-				<View>
-					<Text style={styles.label}>Full name</Text>
-					<TextInput
-						style={{
-							...styles.input,
-							borderColor: nameIsValid ? "white" : "red",
-						}}
-						placeholder="Maggie"
-						onChangeText={(text) => setName(text)}
-					></TextInput>
-					<Text
-						style={{
-							...styles.errorText,
-							display: !nameIsValid ? "flex" : "none",
-						}}
-					>
-						Invalid Name. Name cannot contain numbers or special characters.
-					</Text>
-				</View>
-				<View>
-					<Text style={styles.label}>Email</Text>
-					<TextInput
-						style={{
-							...styles.input,
-							borderColor: emailIsValid ? "white" : "red",
-						}}
-						inputMode="email"
-						onChangeText={(text) => setEmail(text)}
-					></TextInput>
-					<Text
-						style={{
-							...styles.errorText,
-							display: !emailIsValid ? "flex" : "none",
-						}}
-					>
-						Invalid email. This email may already be in use.
-					</Text>
-				</View>
-				<View>
-					<Text style={styles.label}>Password</Text>
-					<TextInput
-						style={styles.input}
-						secureTextEntry={true}
-						onChangeText={(text) => setPassword(text)}
-					></TextInput>
-					<Text
-						style={{
-							...styles.errorText,
-							display: !passwordIsValid ? "flex" : "none",
-						}}
-					>
-						Invalid password. Must be more than 6 characters.
-					</Text>
-				</View>
-				<View
-					style={{
-						flexDirection: "row",
-						alignItems: "center",
-						flexWrap: "wrap",
-						gap: 10,
-					}}
-				>
-					<BouncyCheckbox
-						disableText
-						fillColor="#8ABAE3"
-						innerIconStyle={{ borderRadius: 0 }}
-						iconStyle={{ borderRadius: 0 }}
-						isChecked={checkboxIsChecked}
-						useBuiltInState={false}
-						onPress={(checked: boolean) => {
-							setCheckbox(!checkboxIsChecked);
-						}}
-					/>
-					<Text>I agree with the terms & conditions</Text>
-					<Text
-						style={{
-							...styles.errorText,
-							display: toggleCheckMessage ? "flex" : "none",
-						}}
-					>
-						This checkbox must be ticked in order to create an account.
-					</Text>
-				</View>
-			</View>
-			<Pressable
-				onPressIn={(e) => setPressed(true)}
-				onPressOut={(e) => setPressed(false)}
-				onPress={() => submit()}
-				style={({ pressed }) => [
-					styles.button,
-					{
-						backgroundColor: pressed ? "#8ABAE3" : "#fff",
-						color: "#fff",
-					},
-				]}
-			>
-				<Text
-					style={{
-						color: pressed ? "#fff" : "#8ABAE3",
-					}}
-				>
-					Sign Up
-				</Text>
-			</Pressable>
-			<Text
-				style={{
-					...styles.errorText,
-					display: !generalError ? "flex" : "none",
-				}}
-			>
-				There was an error creating your account. Please try again later.
-			</Text>
-		</View>
-	);
+      <Pressable
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
+        onPress={submit}
+        style={[
+          styles.button,
+          {
+            backgroundColor: pressed ? "#fff" : "#8ABAE3",
+            borderColor: pressed ? "#8ABAE3" : "#fff",
+          },
+        ]}
+      >
+        <Text style={{ color: pressed ? "#8ABAE3" : "#fff", fontSize: 16 }}>
+          Sign Up
+        </Text>
+      </Pressable>
+
+      <View style={styles.socialLogin}>
+        <Text style={styles.orContinueText}>Or Continue with</Text>
+        <View style={styles.socialButtonsContainer}>
+          <Pressable style={styles.socialButton}>
+            <AntDesign name="google" size={30} color="#4285F4" />
+          </Pressable>
+          <Pressable style={styles.socialButton}>
+            <Entypo name="facebook" size={30} color="#4267B2" />
+          </Pressable>
+        </View>
+      </View>
+
+      <Pressable onPress={() => router.push("/auth/signin")}>
+        <Text style={styles.footerText}>
+          Already have an account? <Text style={styles.linkText}>Sign In</Text>
+        </Text>
+      </Pressable>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-	page: {
-		flex: 1,
-		alignItems: "center",
-	},
-	back: {
-		top: 10,
-		left: 10,
-		width: "auto",
-	},
-	header: {
-		flex: 1,
-		justifyContent: "space-evenly",
-		alignItems: "center",
-		maxHeight: "20%",
-	},
-	label: {
-		fontSize: 22,
-	},
-	input: {
-		width: "100%",
-		height: 64,
-		backgroundColor: "#F1F1F1",
-		borderRadius: 15,
-		color: "#000",
-		fontSize: 24,
-		alignItems: "center",
-		justifyContent: "center",
-		padding: 10,
-		borderWidth: 2,
-		borderColor: "#fff",
-	},
-	button: {
-		padding: 10,
-		width: 245,
-		textAlign: "center",
-		height: 55,
-		backgroundColor: "#fff",
-		borderRadius: 25,
-		overflow: "hidden",
-		borderColor: "#8ABAE3",
-		borderWidth: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		alignSelf: "center",
-		color: "8ABAE3",
-	},
-	errorText: {
-		fontSize: 14,
-		color: "red",
-		fontStyle: "italic",
-	},
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  back: {
+    position: "absolute",
+    top: 70,
+    left: 20,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  signUpText: {
+    fontSize: 24,
+    fontWeight: "400",
+    marginBottom: 60,
+  },
+  welcomeText: {
+    marginTop: 50,
+    fontSize: 36,
+    fontWeight: "bold",
+  },
+  promptText: {
+    fontSize: 18,
+  },
+  form: {
+    width: "90%",
+    padding: 20,
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 18,
+    marginBottom: 8,
+  },
+  input: {
+    width: "100%",
+    height: 50,
+    backgroundColor: "#F1F1F1",
+    borderRadius: 15,
+    fontSize: 18,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    //alignItems: "flex-end",
+    marginBottom: 20,
+  },
+  checkboxText: {
+    margin: 8,
+  },
+  checkbox: {
+    alignSelf: "auto",
+  },
+  button: {
+    paddingVertical: 16,
+    paddingHorizontal: 78,
+    borderRadius: 28,
+    borderColor: "#8ABAE3",
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: -20,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  socialLogin: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  socialButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "40%",
+    marginBottom: 30,
+  },
+  socialButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#F1F1F1",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  orContinueText: {
+    color: "#8E8E8E",
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  footerText: {
+    fontSize: 16,
+    color: "#8E8E8E",
+  },
+  linkText: {
+    color: "#8ABAE3",
+    fontWeight: "bold",
+  },
 });
