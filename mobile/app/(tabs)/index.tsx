@@ -16,7 +16,7 @@ import { useAuth } from "../authContext";
 import { Ionicons, FontAwesome, AntDesign } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { getUser } from "../lib/auth";
 
 export default function HomePage() {
@@ -53,7 +53,7 @@ export default function HomePage() {
 	});
 
 	interface Category {
-		categoryID: number;
+		id: number;
 		name: string;
 	}
 
@@ -126,7 +126,12 @@ export default function HomePage() {
 	const fetchOutfitCategories = async () => {
 		try {
 			const response = await axios.get(OUTFIT_CATEGORIES_API_URL);
+			const response: AxiosResponse<{
+				data: Category[];
+				error: string | null;
+			}> = await axios.get(OUTFIT_CATEGORIES_API_URL);
 			if (Array.isArray(response.data.data)) {
+				console.log(response.data.data);
 				setCategories(response.data.data);
 			} else {
 				console.error("Unexpected response format:", response.data);
@@ -234,8 +239,8 @@ export default function HomePage() {
 		const currentUser = getUser();
 		setUser(currentUser); // Set the user state
 
-		fetchWeatherData(latitude, longitude);
 		fetchOutfitCategories();
+		fetchWeatherData(latitude, longitude);
 		console.log("Current user:", currentUser);
 	}, []);
 
