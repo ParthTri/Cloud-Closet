@@ -125,7 +125,6 @@ export default function HomePage() {
 
 	const fetchOutfitCategories = async () => {
 		try {
-			const response = await axios.get(OUTFIT_CATEGORIES_API_URL);
 			const response: AxiosResponse<{
 				data: Category[];
 				error: string | null;
@@ -409,11 +408,11 @@ export default function HomePage() {
 									>
 										{categories.map((category) => (
 											<Pressable
-												key={category.categoryID}
-												onPress={() => selectedCategory(category.categoryID)}
+												key={category.id}
+												onPress={() => selectedCategory(category.id)}
 												style={[
 													styles.categoryButton,
-													selectedCategories.includes(category.categoryID) &&
+													selectedCategories.includes(category.id) &&
 														styles.selectedCategory,
 												]}
 											>
@@ -421,6 +420,12 @@ export default function HomePage() {
 											</Pressable>
 										))}
 									</ScrollView>
+									<View>
+										<TextInput
+											style={styles.textInputText}
+											onChangeText={(text) => setOutfitName(text)}
+										/>
+									</View>
 									<View style={styles.modalButtonContainer}>
 										<Button title="Save" onPress={saveImageWithCategories} />
 										<Button
@@ -702,5 +707,19 @@ const styles = StyleSheet.create({
 		top: 10,
 		right: 10,
 		zIndex: 1,
+	},
+	textInputText: {
+		flex: 1,
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		color: "#000000",
+		backgroundColor: "#D0D0D0",
+		borderRadius: 5,
+		padding: 10,
+		paddingHorizontal: 10,
+		fontSize: 14,
+		borderWidth: 1,
+		borderColor: "#A0A0A0",
 	},
 });
