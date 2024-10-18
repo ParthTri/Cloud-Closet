@@ -101,7 +101,10 @@ export default function Outfits() {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [categories, setCategories] = useState([]);
   // const [categories, setCategories] = useState(fallbackCategories.data); // temporary
-  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [currentTopsIndex, setCurrentTopsIndex] = useState(0);
+  const [currentBottomsIndex, setCurrentBottomsIndex] = useState(0);
+  const [currentFootwearIndex, setCurrentFootwearIndex] = useState(0);
   const [outfitName, setOutfitName] = useState<string>("");
   const [isEditable, setIsEditable] = useState(true);
   const [currentImages, setCurrentImages] = useState<any[]>([]);
@@ -128,13 +131,14 @@ export default function Outfits() {
     }
   };
 
-  // Function to save outfit
+  // Function to save outfit with categories
   const saveOutfit = async () => {
     try {
       const outfitData = {
-        name: outfitName,
-        categories: selectedCategories,
-        items: items.map((item) => item.id),
+        userId: userID,
+        outfitName: outfitName,
+        joinImageIdsString: items.map((item) => item.imageId).join(","), // Convert array to comma-separated string
+        joincategoryIdsString: selectedCategories.join(","), // Convert array to comma-separated string
       };
       const response = await axios.post(SAVE_OUTFIT_API_URL, outfitData);
       if (response.status === 200) {
@@ -142,7 +146,7 @@ export default function Outfits() {
         setSelectedCategories([]);
         setOutfitName("");
       } else {
-        Alert.alert("Sorry, there was an issue.", "Outfit could not be saved.");
+        Alert.alert("Error", "Outfit could not be saved.");
       }
     } catch (error) {
       console.error("Error saving outfit:", error);
@@ -215,18 +219,12 @@ export default function Outfits() {
     fetchOutfitCategories();
   }, []);
 
-  // Left Button
-  const handleLeftPress = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? currentImages.length - 1 : prevIndex - 1
-    );
+  const handleLeftPress = (currentIndex, setIndex, images) => {
+    setIndex(currentIndex === 0 ? images.length - 1 : currentIndex - 1);
   };
 
-  // Right Button
-  const handleRightPress = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === currentImages.length - 1 ? 0 : prevIndex + 1
-    );
+  const handleRightPress = (currentIndex, setIndex, images) => {
+    setIndex(currentIndex === images.length - 1 ? 0 : currentIndex + 1);
   };
 
   const saveOutfitWithCategories = async () => {
@@ -304,20 +302,32 @@ export default function Outfits() {
         <Text style={styles.sliderTitleText}>Tops</Text>
         <View style={styles.sliderContainer}>
           {/* Left Button */}
-          <Pressable onPress={handleLeftPress}>
+          <Pressable
+            onPress={() =>
+              handleLeftPress(currentTopsIndex, setCurrentTopsIndex, topsImages)
+            }
+          >
             <Entypo name="chevron-thin-left" size={50} color="#8ABAE3" />
           </Pressable>
 
-          {/* get Tops photos for slider */}
-          <FlatList
-            data={topsImages}
-            renderItem={renderTops}
-            keyExtractor={(item) => item.imageId.toString()}
-            contentContainerStyle={styles.sliderImage}
-          />
+          {/* Get the Tops Images for the slider */}
+          {topsImages.length > 0 && (
+            <Image
+              source={{ uri: topsImages[currentTopsIndex].processedUrl }}
+              style={styles.sliderImage}
+            />
+          )}
 
           {/* Right Button */}
-          <Pressable onPress={handleRightPress}>
+          <Pressable
+            onPress={() =>
+              handleRightPress(
+                currentTopsIndex,
+                setCurrentTopsIndex,
+                topsImages
+              )
+            }
+          >
             <Entypo name="chevron-thin-right" size={50} color="#8ABAE3" />
           </Pressable>
         </View>
@@ -326,20 +336,36 @@ export default function Outfits() {
         <Text style={styles.sliderTitleText}>Bottoms</Text>
         <View style={styles.sliderContainer}>
           {/* Left Button */}
-          <Pressable>
+          <Pressable
+            onPress={() =>
+              handleLeftPress(
+                currentBottomsIndex,
+                setCurrentBottomsIndex,
+                bottomsImages
+              )
+            }
+          >
             <Entypo name="chevron-thin-left" size={50} color="#8ABAE3" />
           </Pressable>
 
-          {/* Get the bottoms image for the slider */}
-          <FlatList
-            data={bottomsImages}
-            renderItem={renderBottoms}
-            keyExtractor={(item) => item.imageId.toString()}
-            contentContainerStyle={styles.sliderImage}
-          />
+          {/* Get the Bottoms Images for the slider */}
+          {bottomsImages.length > 0 && (
+            <Image
+              source={{ uri: bottomsImages[currentBottomsIndex].processedUrl }}
+              style={styles.sliderImage}
+            />
+          )}
 
           {/* Right Button */}
-          <Pressable>
+          <Pressable
+            onPress={() =>
+              handleRightPress(
+                currentBottomsIndex,
+                setCurrentBottomsIndex,
+                bottomsImages
+              )
+            }
+          >
             <Entypo name="chevron-thin-right" size={50} color="#8ABAE3" />
           </Pressable>
         </View>
@@ -348,20 +374,38 @@ export default function Outfits() {
         <Text style={styles.sliderTitleText}>Footwear</Text>
         <View style={styles.sliderContainer}>
           {/* Left Button */}
-          <Pressable>
+          <Pressable
+            onPress={() =>
+              handleLeftPress(
+                currentFootwearIndex,
+                setCurrentFootwearIndex,
+                footwearImages
+              )
+            }
+          >
             <Entypo name="chevron-thin-left" size={50} color="#8ABAE3" />
           </Pressable>
 
-          {/* Get the Footwear image for the slider */}
-          <FlatList
-            data={footwearImages}
-            renderItem={renderFootwear}
-            keyExtractor={(item) => item.imageId.toString()}
-            contentContainerStyle={styles.sliderImage}
-          />
+          {/* Get the Footwear Images for the slider */}
+          {footwearImages.length > 0 && (
+            <Image
+              source={{
+                uri: footwearImages[currentFootwearIndex].processedUrl,
+              }}
+              style={styles.sliderImage}
+            />
+          )}
 
           {/* Right Button */}
-          <Pressable>
+          <Pressable
+            onPress={() =>
+              handleRightPress(
+                currentFootwearIndex,
+                setCurrentFootwearIndex,
+                footwearImages
+              )
+            }
+          >
             <Entypo name="chevron-thin-right" size={50} color="#8ABAE3" />
           </Pressable>
         </View>
