@@ -86,6 +86,7 @@ async function getUserItems(
 
   const json: { data: ImageInterface[]; error: string | null } =
     await data.json();
+  console.log(json.data[0]);
   return json;
 }
 
@@ -168,6 +169,11 @@ export default function Outfits() {
             }
           });
           const bottoms = fetchedItems.data.filter((item) => {
+            console.log(
+              item.categories.filter(
+                (cat) => cat.metaCategoryName == BOTTOM_META_CATEGORY
+              )
+            );
             if (
               item.categories.filter(
                 (cat) => cat.metaCategoryName == BOTTOM_META_CATEGORY
