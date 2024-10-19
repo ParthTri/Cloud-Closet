@@ -100,16 +100,6 @@ export default function HomePage() {
 		}
 	};
 
-	// updated uploadImage, selectedCategory,
-	// saveImageWithCategories, fetchOutfitCategories & useEffect
-	const uploadImage = async () => {
-		if (!selectedImage || selectedCategories.length === 0) {
-			Alert.alert("Error", "Please select at least one category");
-			return;
-		}
-		setUploading(true);
-	};
-
 	const selectedCategory = (categoryID: number) => {
 		if (selectedCategories.includes(categoryID)) {
 			setSelectedCategories(
@@ -121,9 +111,30 @@ export default function HomePage() {
 	};
 
 	const saveImageWithCategories = async () => {
-		await uploadImage();
-		setSelectedCategories([]);
-		setIsModalVisible(false);
+		if (selectedCategories.length === 0) {
+			Alert.alert("Error", "Please select at least one category");
+			return;
+		}
+
+		const payload = {
+			userId: user?.userId,
+			outfitName: outfitName,
+			joincategoryIdsString: selectedCategories.join(","),
+			joinImageIdsString: generatedImage?.map((val) => val.imageId).join(","),
+		};
+
+		const res = await axios.post(API_CREATE_OUTFIT, payload);
+		if (res.status == 200 || res.status == 201) {
+			Alert.alert("Outfit created");
+
+			setGeneratedImage(null);
+			setIsCategorySelectionVisible(false);
+
+			setIsModalVisible(false);
+		} else {
+			Alert.alert("Outfit not created");
+		}
+		return;
 	};
 
 	const fetchOutfitCategories = async () => {
