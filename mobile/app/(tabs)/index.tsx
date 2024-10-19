@@ -438,6 +438,7 @@ export default function HomePage() {
 										<Button
 											title="Cancel"
 											onPress={() => {
+												setIsCategorySelectionVisible(false);
 												setIsModalVisible(false);
 											}}
 										/>
