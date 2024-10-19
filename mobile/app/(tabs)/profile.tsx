@@ -1,18 +1,20 @@
 import React, { useState } from "react";
-import { 
+import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  View, 
-  Text, 
-  Switch, 
-  StyleSheet
+  View,
+  Text,
+  Switch,
+  StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { getUser } from "../lib/auth";
 
 export default function Profile() {
   const router = useRouter();
+  const user = getUser();
 
   const [form, setForm] = useState({
     emailNotifications: true,
@@ -20,19 +22,15 @@ export default function Profile() {
   });
 
   const goToHome = () => {
-    router.push("/(tabs)");
+    router.push("../auth/signin");
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f8f8" }}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={goToHome}
-          style={styles.headerAction}
-        >
+        <TouchableOpacity onPress={goToHome} style={styles.headerAction}>
           <AntDesign name="arrowleft" size={24} color="#000" />
-
         </TouchableOpacity>
         <Text numberOfLines={1} style={styles.headerTitle}>
           Profile
@@ -52,8 +50,10 @@ export default function Profile() {
         <View style={styles.section}>
           <TouchableOpacity style={styles.profile}>
             <View style={styles.profileBody}>
-              <Text style={styles.profileName}>John Doe</Text>
-              <Text style={styles.profileHandle}>youremail@domain.com</Text>
+              <Text style={styles.profileName}>John Test</Text>
+              <Text style={styles.profileHandle}>
+                {user?.email || "youremail@domain.com"}
+              </Text>
             </View>
             <AntDesign name="right" size={22} color="#bcbcbc" />
           </TouchableOpacity>
@@ -106,13 +106,13 @@ export default function Profile() {
           <View style={styles.sectionBody}>
             <TouchableOpacity style={styles.row}>
               <Text style={styles.rowLabel}>Help & Support</Text>
-			  <View style={styles.rowSpacer} />
+              <View style={styles.rowSpacer} />
               <AntDesign name="right" size={19} color="#bcbcbc" />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.row}>
               <Text style={styles.rowLabel}>Privacy Policy</Text>
-			  <View style={styles.rowSpacer} />
+              <View style={styles.rowSpacer} />
               <AntDesign name="right" size={19} color="#bcbcbc" />
             </TouchableOpacity>
           </View>
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     paddingRight: 12,
-	paddingLeft: 12,
+    paddingLeft: 12,
   },
   rowLabel: {
     fontSize: 16,
