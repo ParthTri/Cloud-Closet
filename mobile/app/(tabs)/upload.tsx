@@ -81,22 +81,16 @@ export default function Upload() {
           exif: true,
         };
 
-        let photo = await cameraRef.current.takePictureAsync(options);
-
-        if (photo.uri) {
-          setSelectedImage(photo.uri);
-          setIsModalVisible(true);
-        } else {
-          Alert.alert("Error", "Could not take picture");
-        }
-      } else {
-        Alert.alert(
-          "Permissions Not Granted",
-          "Please allow all permissions in Settings."
-        );
-      }
-    }
-  }
+		if (photo.uri) { // only an error until picture is taken (photo becomes defined)
+			setSelectedImage(photo.uri);
+			setIsModalVisible(true);
+		} else {
+			Alert.alert('Error', 'Could not take picture');
+		}
+		} else {
+		Alert.alert('Permissions Not Granted', 'Please allow all permissions in Settings.');
+		}
+  }};
 
   const uploadImage = async () => {
     if (!selectedImage || selectedCategories.length === 0) {
