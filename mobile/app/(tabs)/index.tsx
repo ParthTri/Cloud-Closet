@@ -34,7 +34,9 @@ export default function HomePage() {
 		useState(false);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-	const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+	const [generatedImage, setGeneratedImage] = useState<any[] | null>(null);
+
+	const [outfitName, setOutfitName] = useState<string>("");
 
 	//weather API
 	const API_Weather = "https://cloudcloset.kolide.co.nz/api/weather";
@@ -43,6 +45,9 @@ export default function HomePage() {
 		"http://cloudcloset.kolide.co.nz/api/outfitCategory/all";
 	//generate outfit API
 	const API_Generate = "https://cloudcloset.kolide.co.nz/api/genOutfit";
+
+	// outfit API
+	const API_CREATE_OUTFIT = "https://cloudcloset.kolide.co.nz/api/outfit";
 
 	const [weatherData, setWeatherData] = useState({
 		weather: "Loading...",
@@ -128,7 +133,6 @@ export default function HomePage() {
 				error: string | null;
 			}> = await axios.get(OUTFIT_CATEGORIES_API_URL);
 			if (Array.isArray(response.data.data)) {
-				console.log(response.data.data);
 				setCategories(response.data.data);
 			} else {
 				console.error("Unexpected response format:", response.data);
@@ -208,7 +212,12 @@ export default function HomePage() {
 
 			if (response.data && response.data.data.length > 0) {
 				const generatedImages = response.data.data.map(
-					(item: { processedUrl: any; imageCategory: any[] }) => ({
+					(item: {
+						imaegId: string;
+						processedUrl: any;
+						imageCategory: any[];
+					}) => ({
+						imageId: item.imaegId,
 						imageUrl: item.processedUrl,
 						categories: item.imageCategory
 							.map((cat) => cat.categoryName)
