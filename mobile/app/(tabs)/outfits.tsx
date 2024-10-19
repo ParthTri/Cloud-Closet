@@ -134,14 +134,31 @@ export default function Outfits() {
   // Function to save outfit with categories
   const saveOutfit = async () => {
     try {
+      const topImageId = topsImages[currentTopsIndex]?.imageId;
+      const bottomImageId = bottomsImages[currentBottomsIndex]?.imageId;
+      const footwearImageId = footwearImages[currentFootwearIndex]?.imageId;
+
+      // Ensure that image IDs are found before proceeding
+      if (!topImageId || !bottomImageId || !footwearImageId) {
+        Alert.alert(
+          "Error",
+          "Could not find image IDs for all clothing items."
+        );
+        return;
+      }
+
       const outfitData = {
         userId: userID,
         outfitName: outfitName,
-        joinImageIdsString: items.map((item) => item.imageId).join(","), // Convert array to comma-separated string
-        joincategoryIdsString: selectedCategories.join(","), // Convert array to comma-separated string
+        joinImageIdsString: [topImageId, bottomImageId, footwearImageId].join(
+          ","
+        ), // Comma-separated image IDs
+        joincategoryIdsString: selectedCategories.join(","),
       };
+      console.log("outfitData being sent:", outfitData);
+
       const response = await axios.post(SAVE_OUTFIT_API_URL, outfitData);
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         Alert.alert("Success", "Outfit saved successfully!");
         setSelectedCategories([]);
         setOutfitName("");
