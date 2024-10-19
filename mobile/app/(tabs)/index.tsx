@@ -12,12 +12,12 @@ import {
 	TouchableOpacity,
 	TouchableWithoutFeedback,
 } from "react-native";
-import { useAuth } from "../authContext";
 import { Ionicons, FontAwesome, AntDesign } from "@expo/vector-icons";
 import { Logo } from "@/components/Logo";
 import React, { useState, useEffect } from "react";
 import axios, { AxiosResponse } from "axios";
 import { getUser } from "../lib/auth";
+import { TextInput } from "react-native";
 
 export default function HomePage() {
 	const user = getUser(); // Get use from auth.ts
@@ -32,10 +32,8 @@ export default function HomePage() {
 
 	const [isCategorySelectionVisible, setIsCategorySelectionVisible] =
 		useState(false);
-	const [selectedImage, setSelectedImage] = useState<string | null>(null);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-	const [uploading, setUploading] = useState(false);
 	const [generatedImage, setGeneratedImage] = useState<string | null>(null);
 
 	//weather API
