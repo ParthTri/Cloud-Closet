@@ -1,27 +1,14 @@
-// src/services/GenerateService.ts
-
 import axios from 'axios';
 
-// Define the API endpoint
 const API_Generate = "https://cloudcloset.kolide.co.nz/api/genOutfit";
 
-// Main service class
 export class GenerateService {
   private selectedCategories: any[];
 
   constructor() {
-    this.selectedCategories = [];  // Initialize selectedCategories
+    this.selectedCategories = []; 
   }
 
-  /**
-   * Fetch the generated outfit images from the API.
-   * @param userId The user ID.
-   * @param longitude User's current longitude.
-   * @param latitude User's current latitude.
-   * @param type Category type to fetch.
-   * @returns Array of generated images or an empty array if failed.
-   */
-  
   public async fetchGenerate(
     userId: string | undefined,
     longitude: number,
@@ -77,8 +64,6 @@ export class GenerateService {
       return [];
     }
   }
-
-  // Setter for selected categories
   public setSelectedCategories(categories: any[]) {
     this.selectedCategories = categories;
   }

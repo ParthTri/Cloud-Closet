@@ -100,6 +100,7 @@ describe("fetchGenerate", () => {
     (axios.post as jest.Mock).mockResolvedValue(mockResponse);
 
     const service = new GenerateService();
+
     const result = await service.fetchGenerate("123", 1.23, 4.56, 1);
 
     expect(result).toEqual([
