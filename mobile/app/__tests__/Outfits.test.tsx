@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
-import Outfits from './Outfits';
+import Outfits from '../(tabs)/outfits';
 import axios from 'axios';
 import { useAuth } from '../authContext';
 
@@ -31,10 +31,5 @@ describe('Outfits Component - Category Functionality', () => {
     jest.clearAllMocks(); 
   });
 });
-
-
-
-
-
 
 
