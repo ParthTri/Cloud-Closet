@@ -1,7 +1,7 @@
 export interface GetWeatherDTO {
   latitude: number;
   longitude: number;
-  timezone: string;
+  timezone?: string;
 }
 
 export interface WeatherDTO {

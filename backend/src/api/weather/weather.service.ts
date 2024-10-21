@@ -16,8 +16,6 @@ export class WeatherService {
         URL_BUILDER(locationData.latitude, locationData.longitude),
       );
 
-      console.log(responses.data);
-
       data = {
         weather: responses.data['weather'][0]['main'],
         temperature: responses.data['main']['temp'],
