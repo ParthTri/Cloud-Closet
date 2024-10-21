@@ -1,4 +1,3 @@
-
 # Cloud-Closet
 
 Cloud-Closet is a mobile application that lets users store and organize their wardrobe in the cloud. With Cloud-Closet, you can easily keep track of your clothes, categorize them, and access your virtual wardrobe anytime, anywhere.
@@ -18,7 +17,7 @@ Cloud-Closet is a mobile application that lets users store and organize their wa
 - **Backend**: NestJS API interacting with Supabase for storage and the OpenWeatherMap API for weather data.
 - **Cloud Infrastructure**: Vercel for hosting frontend and backend services, Docker for containerization.
 - **Database**: Supabase (PostgreSQL) for user and wardrobe data storage.
-  
+
 ## Installation
 
 To run this project locally, you'll need to clone the repository and set up both the frontend and backend.
@@ -35,80 +34,78 @@ To run this project locally, you'll need to clone the repository and set up both
 
 1. **Clone the repository**:
 
-    \`\`\`bash
-    git clone https://github.com/yourusername/cloudcloset.git
-    cd cloudcloset
-    \`\`\`
+   ```bash
+   git clone https://github.com/ParthTri/Cloud-Closet.git
+   cd cloudcloset
+   ```
 
 2. **Frontend setup**:
 
-    \`\`\`bash
-    cd frontend
-    npm install
-    \`\`\`
+   ```bash
+   cd frontend
+   npm install
+   ```
 
 3. **Backend setup**:
 
-    Navigate to the backend directory and install dependencies.
+   Navigate to the backend directory and install dependencies.
 
-    \`\`\`bash
-    cd ../backend
-    npm install
-    \`\`\`
+   ```bash
+   cd ../backend
+   npm install
+   ```
 
 4. **Environment Variables**:
 
-    Create \`.env\` files in both `frontend` and `backend` directories with the following information:
+   Create `.env` files in both `frontend` and `backend` directories with the following information:
 
-    **Backend (`backend/.env`)**:
+   **Backend (`backend/.env`)**:
 
-    \`\`\`
-    SUPABASE_URL=your_supabase_url
-    SUPABASE_KEY=your_supabase_key
-    OPENWEATHER_API_KEY=your_openweathermap_api_key
-    \`\`\`
+   ```
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_KEY=your_supabase_key
+   OPENWEATHER_API_KEY=your_openweathermap_api_key
+   ```
 
-    **Frontend (`frontend/.env`)**:
+   **Frontend (`frontend/.env`)**:
 
-    \`\`\`
-    API_URL=http://localhost:8081
-    \`\`\`
+   ```
+   API_URL=http://localhost:8081
+   ```
 
 5. **Running the Application**:
 
-    Start the backend service:
+   Start the backend service:
 
-    \`\`\`bash
-    cd backend
-    npm run start:dev
-    \`\`\`
+   ```bash
+   cd backend
+   npm run start:dev
+   ```
 
-    Start the frontend app (using React Native):
+   Start the frontend app (using React Native):
 
-    \`\`\`bash
-    cd ../frontend
-    npm run start
-    \`\`\`
+   ```bash
+   cd ../frontend
+   npm run start
+   ```
 
 6. **Docker Setup (optional)**:
 
-    You can also use Docker to containerize and deploy the application. The Docker configurations are available in the \`docker-compose.yml\` file.
+   You can also use Docker to containerize and deploy the application. The Docker configurations are available in the \`docker-compose.yml\` file.
 
-    To start the app with Docker:
+   To start the app with Docker:
 
-    \`\`\`bash
-    docker-compose up --build
-    \`\`\`
+   ```bash
+   docker-compose up --build
+   ```
 
-## Deployment
+## Authors
 
-Both the frontend and backend can be deployed on Vercel. You can connect your GitHub repository to Vercel for automatic deployments or use the Vercel CLI.
-
-For manual deployment:
-
-\`\`\`bash
-vercel --prod
-\`\`\`
+- [Parth](https://github.com/ParthTri)
+- [Monica](https://github.com/MonicaAnhLuong)
+- [Ari](https://github.com/ariiii28)
+- [Diya](https://github.com/diyatop1204)
+- [Frank](https://github.com/knarffffff)
 
 ## Contributing
 
