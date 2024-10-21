@@ -1,0 +1,18 @@
+meta {
+  name: Get images for user
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://cloudcloset.kolide.co.nz/api/image/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "1ecdfc12-a195-4d6c-ad36-60893871e682",
+    "access_token": ""
+  }
+}
